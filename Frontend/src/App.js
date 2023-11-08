@@ -2,6 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home.jsx'
 import Layout from './components/Layout.jsx'
+import SignIn from './pages/Auth/SignIn.jsx'
+import SignUp from './pages/Auth/SignUp.jsx'
 
 function App() {
   return (
