@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+:root {
+    --primary-color: #f36100;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -9,4 +14,16 @@
 body {
     font-family: 'Roboto', sans-serif;
     background-color: black;
+}
+
+.Layout {
+    position: relative;
+    background-image: url('../public/hero-1.jpg');
+    background-position: 40% 20%;
+    background-repeat: no-repeat;
+}
+
+.Home {
+    /* border: 1px solid blue; */
+    min-height: 100vh;
 }

@@ -6,11 +6,9 @@ function Home() {
   const count = useSelector((state) => state.user)
   const dispatch = useDispatch()
   return (
-    <div className="">
+    <div className="Home">
       <div>
-        <button
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}>
+        <button aria-label="Increment value" onClick={() => dispatch(increment())}>
           Increment
         </button>
         <span>{count.value}</span>

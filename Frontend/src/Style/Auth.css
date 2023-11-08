@@ -1,0 +1,168 @@
+/* Auth Page common css */
+.Auth_Modal {
+    /* border: 1px solid blue; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 100vh;
+    width: 100%;
+    backdrop-filter: blur(1px);
+}
+
+.Auth_Container {
+    /* border: 1px solid green; */
+    background-color: rgb(240, 240, 240);
+    border-radius: 1vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vw;
+    position: relative;
+}
+
+.Auth_Logo {
+    /* border: 1px solid red; */
+    height: 2.8vw;
+    width: 12vw;
+}
+
+.Auth_Logo_Image {
+    height: 100%;
+    width: 100%;
+}
+
+.AuthCloseButton {
+    /* border: 1px solid red; */
+    position: absolute;
+    right: 0.5vw;
+    top: 0.5vw;
+    height: 1vw;
+    width: 1vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.CloseImage {
+    height: 100%;
+    width: 100%;
+}
+
+.Auth_Input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 0.5vw;
+    height: 3vw;
+    font-size: 1vw;
+    color: black;
+    border-radius: 0.5vw;
+    border: 0.2vw solid rgb(224, 224, 224);
+}
+
+/* --------------------------------------------------------------------------------------- */
+
+/* Sign In */
+.SignIn_Container {
+    height: fit-content;
+    width: 30vw;
+}
+
+.SignIn_Form {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    gap: 1vw;
+    width: 100%;
+    margin-top: 3vw;
+}
+
+
+
+.SignIn_Button_Container {
+    /* border: 1px solid red; */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5vw;
+
+}
+
+.SignIn_ForgotPass {
+    color: var(--primary-color);
+    font-size: 0.8vw;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.SignIn_Submit {
+    border: none;
+    outline: none;
+    font-size: 1.2vw;
+    background-color: var(--primary-color);
+    padding: 0.5vw 1vw;
+    border-radius: 0.5vw;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+
+/* --------------------------------------------------------------------------------------- */
+
+/* Sign Up */
+
+.SignUp_Container {
+    height: fit-content;
+    width: 50vw;
+}
+
+
+.SignUp_Form {
+    /* border: 1px solid blue; */
+    width: 100%;
+    margin-top: 3vw;
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+}
+
+.SignUp_Input_Container {
+    /* border: 1px solid green; */
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-column-gap: 2vw;
+    grid-row-gap: 1vw;
+}
+
+.Custom_ImageUploader{
+    /* border: 1px solid red; */
+    position: relative;
+}
+
+.FileUploader{
+    position: absolute;
+    inset: 0;
+    border: 1px solid green;
+    opacity: 0;
+    
+}
+
+.Custom_ImageUploader_Preview{
+    position: absolute;
+    top: 0.2vw;
+    right: 0.2vw;
+    bottom: 0;
+    height: 85%;
+    width: 3vw;
+    border-radius: 0.5vw;
+
+}
