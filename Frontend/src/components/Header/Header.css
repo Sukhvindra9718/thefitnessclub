@@ -1,0 +1,48 @@
+.Header {
+    /* border: 1px solid red; */
+    height: 10vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2vw;
+}
+
+.Header_Logo {
+    height: 2.8vw;
+    width: 12vw;
+}
+
+.Header_Logo_Image {
+    height: 100%;
+    width: 100%;
+}
+
+.Header_Navigation {
+    display: flex;
+    align-items: center;
+    gap: 1.8vw;
+}
+
+.Header_Navigation .Link {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1vw;
+}
+
+.Header_Auth{
+    /* border: 1px solid red; */
+    width: 10vw;
+    height: 3vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1vw;
+}
+
+.Header_Auth_btn{
+    border: none;
+    background-color: transparent;
+    font-size: 1.2vw;
+    font-weight: 600;
+    cursor: pointer;
+}
