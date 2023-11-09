@@ -15,7 +15,7 @@
 
 .Auth_Container {
     /* border: 1px solid green; */
-    background-color: rgb(240, 240, 240);
+    background-color: var(--bg-gray);
     border-radius: 1vw;
     display: flex;
     flex-direction: column;
@@ -138,31 +138,39 @@
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     grid-column-gap: 2vw;
     grid-row-gap: 1vw;
 }
 
-.Custom_ImageUploader{
+
+.Custom_ImageUploader {
     /* border: 1px solid red; */
     position: relative;
 }
 
-.FileUploader{
+.FileUploader {
     position: absolute;
     inset: 0;
-    border: 1px solid green;
     opacity: 0;
-    
+
 }
 
-.Custom_ImageUploader_Preview{
-    position: absolute;
-    top: 0.2vw;
-    right: 0.2vw;
-    bottom: 0;
-    height: 85%;
-    width: 3vw;
-    border-radius: 0.5vw;
+.Custom_ImageUploader_Preview_Container {
+    grid-row-start: 1;
+    grid-column-start: 2;
 
+    grid-row-end: 3;
+    grid-column-end: 3;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.Custom_ImageUploader_Preview {
+    width: 7vw;
+    height: 7vw;
+    border-radius: 50%;
+    object-fit: contain;
 }

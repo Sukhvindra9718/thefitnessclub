@@ -7,12 +7,12 @@ const SignUp = ({ SetSignUpVisible }) => {
     SetSignUpVisible((signUpVisible) => !signUpVisible)
   }
 
-  const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
   const [selectedFileName, setSelectedFileName] = useState(null)
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
-      setSelectedFile(file)
+      setSelectedFile(URL.createObjectURL(file))
       setSelectedFileName(file.name)
     } else {
       setSelectedFile(null)
@@ -31,7 +31,9 @@ const SignUp = ({ SetSignUpVisible }) => {
         <form action="" method="post" className="SignUp_Form">
           <div className="SignUp_Input_Container">
             <input className="Auth_Input" type="text" placeholder="Full Name" />
-            <input className="Auth_Input" type="text" placeholder="Phone Number" />
+            <div className="Custom_ImageUploader_Preview_Container">
+              <img src={selectedFile} alt="Preview" className="Custom_ImageUploader_Preview" />
+            </div>
             <div className="Custom_ImageUploader">
               <input
                 className="Auth_Input"
@@ -39,13 +41,6 @@ const SignUp = ({ SetSignUpVisible }) => {
                 value={selectedFileName}
                 placeholder={'Profile Image'}
               />
-              {selectedFile && (
-                <img
-                  src={URL.createObjectURL(selectedFile)}
-                  alt="Preview"
-                  className="Custom_ImageUploader_Preview"
-                />
-              )}
               <input
                 className="FileUploader"
                 type="file"
@@ -54,6 +49,7 @@ const SignUp = ({ SetSignUpVisible }) => {
                 onChange={(e) => handleFileChange(e)}
               />
             </div>
+            <input className="Auth_Input" type="text" placeholder="Phone Number" />
             <input className="SignUp_Email Auth_Input" type="text" placeholder="Email" />
             <input className="SignUp_Password Auth_Input" type="password" placeholder="Password" />
             <input

@@ -2,6 +2,9 @@
 
 :root {
     --primary-color: #f36100;
+    --bg-gray: rgb(227, 227, 227);
+    --bg-gray-2: rgb(224, 224, 224);
+
 }
 
 * {
