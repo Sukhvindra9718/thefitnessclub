@@ -3,7 +3,10 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    value: 0
+    value: 0,
+    Success: false,
+    Reject: false,
+    Loading: false
   },
   reducers: {
     increment: (state) => {
@@ -19,11 +22,28 @@ export const userSlice = createSlice({
     },
     incrementByAmount: (state, action) => {
       state.value += action.payload
+    },
+
+    signIn: (state, action) => {
+      const { email, password } = action.payload
+      if ((email, password)) {
+        state.Loading = true
+        // call the api here
+      }
+    },
+
+    signUp: (state, action) => {
+      const { name, email, phoneNumber, profileImage, password, confirmPassword } = action.payload
+      if (action.payload) {
+        state.Loading = true
+        console.log(name, email, phoneNumber, profileImage, password, confirmPassword)
+        // call the api here
+      }
     }
   }
 })
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount } = userSlice.actions
+export const { increment, decrement, incrementByAmount, signIn, signUp } = userSlice.actions
 
 export default userSlice.reducer
