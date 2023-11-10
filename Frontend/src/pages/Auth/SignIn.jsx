@@ -1,23 +1,57 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { signIn } from '../../features/slices/userSlices'
 
 const SignIn = ({ SetSignInVisible }) => {
   const handleSignInVisibility = () => {
-    // Enable scrolling
     document.body.style.overflow = 'auto'
     SetSignInVisible((signInVisible) => !signInVisible)
   }
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  })
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
+  const user = useSelector((state) => state.user)
+  const dispatch = useDispatch()
+
+  const handleSignIn = (e) => {
+    e.preventDefault()
+    dispatch(signIn(formData))
+  }
+
   return (
     <div className="Auth_Modal">
       <div className="SignIn_Container Auth_Container">
         <div className="Auth_Logo">
           <img className="Auth_Logo_Image" src="./Logo.png" alt="Logo" />
         </div>
-        <div onClick={() => handleSignInVisibility()} className="AuthCloseButton">
+        <div onClick={handleSignInVisibility} className="AuthCloseButton">
           <img className="CloseImage" src="./close.svg" alt="" />
         </div>
-        <form action="" method="post" className="SignIn_Form">
-          <input className="SignIn_Email Auth_Input" type="text" placeholder="Email" />
-          <input className="SignIn_Password Auth_Input" type="password" placeholder="Password" />
+        <form onSubmit={handleSignIn} className="SignIn_Form">
+          <input
+            className="SignIn_Email Auth_Input"
+            type="text"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+          />
+          <input
+            className="SignIn_Password Auth_Input"
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleInputChange}
+          />
           <div className="SignIn_Button_Container">
             <a className="SignIn_ForgotPass" href="/">
               Forgot Password?

@@ -4,6 +4,9 @@
     --primary-color: #f36100;
     --secondary-color: #f5f5f5;
     --primary-color-dark: #d35400;
+    --bg-gray: rgb(227, 227, 227);
+    --bg-gray-2: rgb(224, 224, 224);
+
 }
 
 * {
