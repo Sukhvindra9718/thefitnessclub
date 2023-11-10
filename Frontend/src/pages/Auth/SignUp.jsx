@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { signUp } from '../../features/slices/userSlices'
 
 const SignUp = ({ SetSignUpVisible }) => {
   // Logic for Show/Hide this Comp.
@@ -24,12 +22,10 @@ const SignUp = ({ SetSignUpVisible }) => {
     setFormData({ ...formData, [name]: value })
   }
   // Logic for Sign Up Form Submission
-  const dispatch = useDispatch()
-  const user = useSelector((state) => state.user)
+
 
   const handleSignUp = (e) => {
     e.preventDefault()
-    dispatch(signUp(formData))
   }
 
   // Logic for Image Uploader

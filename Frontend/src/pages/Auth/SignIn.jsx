@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { signIn } from '../../features/slices/userSlices'
+
 
 const SignIn = ({ SetSignInVisible }) => {
   const handleSignInVisibility = () => {
@@ -18,12 +17,9 @@ const SignIn = ({ SetSignInVisible }) => {
     setFormData({ ...formData, [name]: value })
   }
 
-  const user = useSelector((state) => state.user)
-  const dispatch = useDispatch()
 
   const handleSignIn = (e) => {
     e.preventDefault()
-    dispatch(signIn(formData))
   }
 
   return (

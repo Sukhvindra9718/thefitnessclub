@@ -404,21 +404,22 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
 
 
 exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
-  let users = [];
+  let gymOwners = [];
   try {
     const client = await pool.connect();
     const query = `SELECT * FROM users`;
     const result = await client.query(query, []);
-
+    
     if (result.rows.length !== 0) {
-      users = result.rows;
+      gymOwners = result.rows;
     }
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   } 
+  
   res.status(200).json({
     success: true,
-    users,
+    gymOwners,
   })
 });
 

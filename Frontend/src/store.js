@@ -1,8 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from '../src/features/slices/userSlices'
+import { allGymOwnersReducer } from './reducers/userReducer'
+
+
+const initialState = {
+  gymOwners: [],
+  loading: false,
+}
 
 export default configureStore({
   reducer: {
-    user: userReducer
-  }
+    gymOwners: allGymOwnersReducer
+  },
+  initialState
 })
+
+
