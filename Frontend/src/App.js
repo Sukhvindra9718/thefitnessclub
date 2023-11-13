@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home.jsx'
+import CompleteProfileDetails from './pages/CompleteProfileDetails.jsx'
 import Layout from './components/Layout.jsx'
 import Dashboard from './pages/Dashboard/Dashboard.jsx'
 
@@ -12,6 +13,7 @@ function App() {
           <Route index element={<Home />} />
         </Route>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/completeprofiledetails" element={<CompleteProfileDetails/>} />
       </Routes>
     </BrowserRouter>
   )

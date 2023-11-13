@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigation } from 'react-router-dom'
 
-const Verify = ({ SetVerifyVisible,email }) => {
+const Verify = ({ SetVerifyVisible, email }) => {
   const [otp, setOtp] = useState('')
   const dispatch = useDispatch()
-
-  const data = useSelector((state)=> state.verify);
-
+  const navigate = useNavigation()
+  const data = useSelector((state) => state.verify)
 
   const handleVerifyVisibility = () => {
     document.body.style.overflow = 'auto'
@@ -16,12 +16,10 @@ const Verify = ({ SetVerifyVisible,email }) => {
   const handleVerify = (e) => {
     e.preventDefault()
   }
-  const resendOtp = ()=>{
-
-  }
+  const resendOtp = () => {}
   useEffect(() => {
     if (data.token) {
-      window.location.href = '/dashboard'
+      navigate('/completeprofiledetails')
     }
   }, [data.token])
 
@@ -34,15 +32,15 @@ const Verify = ({ SetVerifyVisible,email }) => {
         <div onClick={handleVerifyVisibility} className="AuthCloseButton">
           <img className="CloseImage" src="./close.svg" alt="" />
         </div>
-        <label style={{marginTop:'1rem'}}>{email}</label>
-        <form onSubmit={handleVerify} className="SignIn_Form" style={{marginTop:'1rem'}}>
+        <label style={{ marginTop: '1rem' }}>{email}</label>
+        <form onSubmit={handleVerify} className="SignIn_Form" style={{ marginTop: '1rem' }}>
           <input
             className="SignIn_Email Auth_Input"
             type="text"
             name="otp"
             placeholder="Enter Otp"
             value={otp}
-            onChange={(e)=> setOtp(e.target.value)}
+            onChange={(e) => setOtp(e.target.value)}
           />
           <div className="SignIn_Button_Container">
             <div className="SignIn_ForgotPass" onClick={resendOtp}>
