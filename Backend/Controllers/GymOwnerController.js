@@ -16,9 +16,10 @@ const pool = new Pool({
 });
 
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, phoneNumber, address } = req.body;
+  const { name, email, password, phoneNumber} = req.body;
   const profileImage = req.file.buffer; // multer file buffer
-
+  const address = '';
+  console.log("req.body",req.body)
   const otp = Math.floor(100000 + Math.random() * 900000);
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -114,7 +115,7 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 
-  pool.end(); // Close the pool when done
+// Close the pool when done
 });
 
 exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
@@ -125,7 +126,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email",email);
-  console.log(user)
+  console.log("login",user.name)
   //Checks if password is correct or not
   if (user.isVerified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
@@ -134,6 +135,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid Email or Password", 401));
   }
+
   sendToken(user, 200, res);
 });
 
@@ -416,7 +418,7 @@ exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   } 
-  
+  pool.end(); // Close the pool when done
   res.status(200).json({
     success: true,
     gymOwners,

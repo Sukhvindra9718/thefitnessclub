@@ -7,13 +7,12 @@ import StaffManagementOverview from './Pages/StaffManagementOverview'
 import ReportsOverview from './Pages/ReportsOverview'
 import OffersPackagesOverview from './Pages/OffersPackagesOverview'
 import { useSelector, useDispatch } from 'react-redux'
-import { getAllMembers } from '../../actions/userAction'
+import { getAllMembers} from '../../actions/userAction'
 
 function Main({ active }) {
   const dispatch = useDispatch()
   const { gymOwners } = useSelector((state) => state.gymOwners)
 
-  console.log("gymOwners",gymOwners)
   useEffect(() => {
     dispatch(getAllMembers())
   }, [dispatch])

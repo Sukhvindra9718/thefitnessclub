@@ -2,8 +2,17 @@ import {
     GET_ALL_USER_REQUEST,
     GET_ALL_USER_SUCCESS,
     GET_ALL_USER_FAIL,
+    LOGIN_REQUEST,
+    LOGIN_SUCCESS,
+    LOGIN_FAIL,
+    REGISTER_USER_REQUEST,
+    REGISTER_USER_SUCCESS,
+    REGISTER_USER_FAIL,
+    VERIFY_REQUEST,
+    VERIFY_SUCCESS,
+    VERIFY_FAIL,
     CLEAR_ERRORS,
-  } from "../constant/userConstants.js"
+  } from "../constant/userConstants";
   
 //   export const userReducer = (state = { user:[] }, action) => {
 //     switch (action.type) {
@@ -170,7 +179,7 @@ import {
 //     }
 //   };
   
-  export const allGymOwnersReducer = (state = { users: [] }, action) => {
+  export const allGymOwnersReducer = (state = { gymOwners: [] }, action) => {
     switch (action.type) {
       case GET_ALL_USER_REQUEST:
         return {
@@ -201,7 +210,108 @@ import {
         return state;
     }
   };
+  export const loginReducer = (state = {}, action) => {
+    switch (action.type) {
+      case LOGIN_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          loginStatus: false,
+        };
+      case LOGIN_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          loginStatus:action.payload.success,
+          token:action.payload.token
+        };
   
+      case LOGIN_FAIL:
+        return {
+          ...state,
+          loading: false,
+          loginStatus: false,
+          error: action.payload,
+        };
+  
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+        };
+  
+      default:
+        return state;
+    }
+  };
+  export const registerReducer = (state = {}, action) => {
+    switch (action.type) {
+      case REGISTER_USER_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          registerStatus: false,
+        };
+      case REGISTER_USER_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          registerStatus:action.payload,
+        };
+  
+      case REGISTER_USER_FAIL:
+        return {
+          ...state,
+          loading: false,
+          registerStatus: false,
+          error: action.payload,
+        };
+  
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+        };
+  
+      default:
+        return state;
+    }
+  };
+
+  export const verifyReducer = (state = {}, action) => {
+    switch (action.type) {
+      case VERIFY_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          loginStatus: false,
+        };
+      case VERIFY_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          loginStatus:action.payload.success,
+          token:action.payload.token
+        };
+  
+      case VERIFY_FAIL:
+        return {
+          ...state,
+          loading: false,
+          loginStatus: false,
+          error: action.payload,
+        };
+  
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+        };
+  
+      default:
+        return state;
+    }
+  };
 //   export const userDetailsReducer = (state = { user: {} }, action) => {
 //     switch (action.type) {
 //       case USER_DETAILS_REQUEST:

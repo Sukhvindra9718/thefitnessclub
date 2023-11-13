@@ -4,9 +4,13 @@ import { Link } from 'react-router-dom'
 import './Header.css'
 import SignIn from '../../pages/Auth/SignIn'
 import SignUp from '../../pages/Auth/SignUp'
+import Verify from '../../pages/Auth/Verify'
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
+  const [verifyVisible,SetVerifyVisible] = useState(false)
+  const [email,setEmail] = useState('');
+
 
   const handleSignInVisibility = () => {
     // Disable scrolling
@@ -48,7 +52,8 @@ function Header() {
         </div>
       </div>
       {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} />}
-      {signUpVisible && <SignUp SetSignUpVisible={SetSignUpVisible} />}
+      {signUpVisible && <SignUp SetSignUpVisible={SetSignUpVisible} SetVerifyVisible={SetVerifyVisible} setEmail={setEmail}/>}
+      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email}/>}
     </>
   )
 }

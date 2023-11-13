@@ -1,7 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { login } from '../../actions/userAction'
+import {useDispatch,useSelector} from "react-redux"
 
 
 const SignIn = ({ SetSignInVisible }) => {
+  const dispatch = useDispatch();
+  const data = useSelector(state => state.auth)
+
   const handleSignInVisibility = () => {
     document.body.style.overflow = 'auto'
     SetSignInVisible((signInVisible) => !signInVisible)
@@ -19,8 +24,17 @@ const SignIn = ({ SetSignInVisible }) => {
 
 
   const handleSignIn = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    console.log("click")
+    dispatch(login(formData));
   }
+
+  useEffect(()=>{
+    if(data.token){
+      window.location.href = "/dashboard"
+    }
+  },[data.token])
+
 
   return (
     <div className="Auth_Modal">

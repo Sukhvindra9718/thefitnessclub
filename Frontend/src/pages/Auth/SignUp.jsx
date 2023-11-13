@@ -1,6 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { register, verify } from '../../actions/userAction';
+import { useDispatch,useSelector } from 'react-redux';
 
-const SignUp = ({ SetSignUpVisible }) => {
+
+const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
+  const dispatch = useDispatch();
+  const {registerStatus} = useSelector((state) => state.register);
+  
+
+
   // Logic for Show/Hide this Comp.
   const handleSignUpVisibility = () => {
     document.body.style.overflow = 'auto'
@@ -25,12 +33,26 @@ const SignUp = ({ SetSignUpVisible }) => {
 
 
   const handleSignUp = (e) => {
+    const {name,email,password,confirmPassword,phoneNumber,profileImage} = formData;
     e.preventDefault()
+    if(password !== confirmPassword){
+      alert("Password and Confirm Password are not same");
+      return;
+    }
+    const SignUpData = new FormData();
+    SignUpData.append('name', name);
+    SignUpData.append('email', email);
+    SignUpData.append('phoneNumber', phoneNumber);
+    SignUpData.append('profile_image', profileImage);
+    SignUpData.append('password', password);
+    dispatch(register(SignUpData))
   }
 
   // Logic for Image Uploader
   const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
   const [selectedFileName, setSelectedFileName] = useState(null)
+
+
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -43,6 +65,14 @@ const SignUp = ({ SetSignUpVisible }) => {
       setSelectedFileName(null)
     }
   }
+
+  useEffect(() => {
+    if (registerStatus) {
+      SetVerifyVisible((verifyVisible) => !verifyVisible)
+      SetSignUpVisible((signUpVisible) => !signUpVisible)
+      setEmail(formData.email)
+    }
+  }, [registerStatus]);
   return (
     <div className="Auth_Modal">
       <div className="SignUp_Container Auth_Container">
