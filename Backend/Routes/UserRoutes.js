@@ -28,6 +28,8 @@ router.route('/membership').post(Authentication,authorizationGymOwner(),takeMemb
 
 
 // Admin Routes
-router.route('/getAllUsers').get(Authentication,authorizationAdmin(),getAllUsers);
+// router.route('/getAllUsers').get(Authentication,authorizationAdmin(),getAllUsers);
+
+router.route('/getAllUsers').get(getAllUsers);
 
 module.exports = router;

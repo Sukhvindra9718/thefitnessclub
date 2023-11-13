@@ -1,8 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit'
-import userReducer from '../src/features/slices/userSlices'
+import { allGymOwnersReducer,loginReducer,registerReducer,verifyReducer} from './reducers/userReducer'
+
+
 
 export default configureStore({
   reducer: {
-    user: userReducer
+    gymOwners: allGymOwnersReducer,
+    auth:loginReducer,
+    register:registerReducer,
+    verify:verifyReducer
   }
 })
+
+
