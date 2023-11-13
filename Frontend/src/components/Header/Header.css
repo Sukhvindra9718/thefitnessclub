@@ -1,10 +1,10 @@
 .Header {
-    /* border: 1px solid red; */
-    height: 10vw;
+    height: 5vw;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2vw;
+    background-color: #8686d6;
 }
 
 .Header_Logo {
@@ -44,5 +44,12 @@
     background-color: transparent;
     font-size: 1.2vw;
     font-weight: 600;
+    cursor: pointer;
+}
+
+.profile-circle img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
     cursor: pointer;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { login } from '../../actions/userAction'
+import { login } from '../../actions/gymOwnersAction'
 import {useDispatch,useSelector} from "react-redux"
 
 

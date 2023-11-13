@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { register, verify } from '../../actions/userAction';
+import { register } from '../../actions/gymOwnersAction';
 import { useDispatch,useSelector } from 'react-redux';
 
 
@@ -72,6 +72,7 @@ const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
       SetSignUpVisible((signUpVisible) => !signUpVisible)
       setEmail(formData.email)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registerStatus]);
   return (
     <div className="Auth_Modal">

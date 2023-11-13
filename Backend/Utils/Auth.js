@@ -12,7 +12,7 @@ const pool = new Pool({
 });
 exports.authorizationGymOwner = () => {
     return async(req, res, next) => {
-      const token = req.cookies.token;
+      const token = req.headers.authorization.split("Bearer ")[1];
       if (!token) {
           return next(new ErrorHandler("Login first to access this resource", 401));
       }
@@ -39,7 +39,7 @@ exports.authorizationGymOwner = () => {
 
 exports.authorizationGymTrainee = () => {
     return async(req, res, next) => {
-      const token = req.cookies.token;
+      const token = req.headers.authorization.split("Bearer ")[1];
       if (!token) {
           return next(new ErrorHandler("Login first to access this resource", 401));
       }
@@ -65,7 +65,7 @@ exports.authorizationGymTrainee = () => {
 
 exports.authorizationGymTrainer = () => {
     return async(req, res, next) => {
-      const token = req.cookies.token;
+      const token = req.headers.authorization.split("Bearer ")[1];
       if (!token) {
           return next(new ErrorHandler("Login first to access this resource", 401));
       }
@@ -92,7 +92,7 @@ exports.authorizationGymTrainer = () => {
 
 exports.authorizationAdmin = () => {
   return async(req, res, next) => {
-    const token = req.cookies.token;
+    const token = req.headers.authorization.split("Bearer ")[1];
     if (!token) {
         return next(new ErrorHandler("Login first to access this resource", 401));
     }
@@ -117,7 +117,8 @@ exports.authorizationAdmin = () => {
 };
 
 exports.Authentication = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.headers.authorization.split("Bearer ")[1];
+
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
   }

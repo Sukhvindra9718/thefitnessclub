@@ -5,6 +5,7 @@ const SendEmail = require("../Utils/SendEmail.js");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 // const { createTable } = require("../Utils/checkIfTableExists.js");
 
 const pool = new Pool({
@@ -16,10 +17,10 @@ const pool = new Pool({
 });
 
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, phoneNumber} = req.body;
+  const { name, email, password, phoneNumber } = req.body;
   const profileImage = req.file.buffer; // multer file buffer
-  const address = '';
-  console.log("req.body",req.body)
+  const address = "";
+
   const otp = Math.floor(100000 + Math.random() * 900000);
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -115,7 +116,7 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 
-// Close the pool when done
+  // Close the pool when done
 });
 
 exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
@@ -125,8 +126,8 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
   if (!email || !password) {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
-  user = await getUserFromDatabase("email",email);
-  console.log("login",user.name)
+  user = await getUserFromDatabase("email", email);
+  
   //Checks if password is correct or not
   if (user.isVerified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
@@ -141,13 +142,14 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
 
 exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
   const { email, otp } = req.body;
+
   //Checks if otp is valid entered by user
   if (!otp) {
     return next(new ErrorHandler("Please enter a valid otp", 400));
   }
   //Finding user in database
 
-  const user = await getUserFromDatabase("email",email);
+  const user = await getUserFromDatabase("email", email);
 
   //Checks if otp is correct or not
   if (user.otp !== otp) {
@@ -158,9 +160,9 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
     // await user.save();
     try {
       const client = await pool.connect();
-      const query = "UPDATE users SET otp = $1, isverified = $2 WHERE email = $3";
+      const query =
+        "UPDATE users SET otp = $1, isverified = $2 WHERE email = $3";
       await client.query(query, ["", true, email]);
-
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     } finally {
@@ -184,27 +186,10 @@ exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
-  const userId = req.params.id;
-  let user = null;
-  let success = false;
-  try {
-    const client = await pool.connect();
-    const query = "SELECT * FROM users WHERE id = $1";
-    const result = await client.query(query, [userId]);
-
-    if (result.rows.length !== 0) {
-      success = true;
-      user = result.rows[0];
-    }
-
-
-  } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
-  } finally {
-    pool.end(); // Close the pool when done
-  }
+  let user = req.user;
+  console.log("req.user", req.user)
   res.status(200).json({
-    success,
+    success: true,
     user,
   });
 });
@@ -212,7 +197,7 @@ exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
 exports.forgotPassword = CatchAsyncErrors(async (req, res, next) => {
   // send forgot password email
   const { email } = req.body;
-  const user = await getUserFromDatabase("email",email);
+  const user = await getUserFromDatabase("email", email);
 
   if (!user) {
     return next(new ErrorHandler("User not found with this email", 404));
@@ -299,10 +284,18 @@ exports.forgotPassword = CatchAsyncErrors(async (req, res, next) => {
 
 exports.resetPassword = CatchAsyncErrors(async (req, res, next) => {
   const { newPassword, confirmPassword } = req.body;
-  const user = await getUserFromDatabase("resetpasswordtoken",req.params.token);
+  const user = await getUserFromDatabase(
+    "resetpasswordtoken",
+    req.params.token
+  );
 
-  if(user.resetpasswordtokenexpire < new Date()){
-    return next(new ErrorHandler("Password reset token is invalid or has been expired", 400));
+  if (user.resetpasswordtokenexpire < new Date()) {
+    return next(
+      new ErrorHandler(
+        "Password reset token is invalid or has been expired",
+        400
+      )
+    );
   }
 
   if (!user) {
@@ -362,7 +355,6 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
     const query = "UPDATE users SET password = $1 WHERE email = $2";
 
     await client.query(query, [password, req.user.email]);
-
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   } finally {
@@ -375,12 +367,12 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, phoneNumber, address,role} = req.body;
-  const profileImage = req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
+  const { name, email, phoneNumber, address, role } = req.body;
+  const profileImage =
+    req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
 
-  const user = await getUserFromDatabase("id",req.user.id);
-  let newRole = role != undefined? role : user.role;
-
+  const user = await getUserFromDatabase("id", req.user.id);
+  let newRole = role != undefined ? role : user.role;
 
   const newUserData = {
     name: name,
@@ -390,8 +382,9 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
     address: address,
     otp: user.otp,
     isverified: user.isverified,
-    role: newRole ,
-    profile_image: profileImage === undefined ? user.profile_image : profileImage,
+    role: newRole,
+    profile_image:
+      profileImage === undefined ? user.profile_image : profileImage,
     createdat: user.createdat,
     resetpasswordtoken: user.resetpasswordtoken,
     resetpasswordtokenexpire: user.resetpasswordtokenexpire,
@@ -404,25 +397,24 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
   let gymOwners = [];
   try {
     const client = await pool.connect();
     const query = `SELECT * FROM users`;
     const result = await client.query(query, []);
-    
+
     if (result.rows.length !== 0) {
       gymOwners = result.rows;
     }
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
-  } 
-  pool.end(); // Close the pool when done
+  }
+
   res.status(200).json({
     success: true,
     gymOwners,
-  })
+  });
 });
 
 exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
@@ -431,36 +423,40 @@ exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
     const client = await pool.connect();
     const query = `DELETE FROM users WHERE id = $1`;
     await client.query(query, [userId]);
-
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
-  } 
+  }
   res.status(200).json({
     success: true,
     message: "User deleted successfully",
-  })
+  });
 });
 
 exports.takeMembership = CatchAsyncErrors(async (req, res, next) => {
-  const {email, membershipType,membershipPrice, membershipDuration} = req.body;
+  const { email, membershipType, membershipPrice, membershipDuration } =
+    req.body;
 
   try {
     const client = await pool.connect();
     // Update users table
-    const query = "UPDATE users SET membership_type = $1, membership_price = $2, membership_duration = $3 WHERE email = $4";
-    await client.query(query, [membershipType, membershipPrice, membershipDuration, email]);
-
-    
+    const query =
+      "UPDATE users SET membership_type = $1, membership_price = $2, membership_duration = $3 WHERE email = $4";
+    await client.query(query, [
+      membershipType,
+      membershipPrice,
+      membershipDuration,
+      email,
+    ]);
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   }
   res.status(200).json({
     success: true,
     membership,
-  })
+  });
 });
 
-const getUserFromDatabase = async (findById,value) => {
+const getUserFromDatabase = async (findById, value) => {
   let user = null;
   try {
     const client = await pool.connect();
@@ -472,7 +468,7 @@ const getUserFromDatabase = async (findById,value) => {
     }
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
-  } 
+  }
   return user;
 };
 
@@ -496,10 +492,9 @@ const updateUserInDatabase = async (user) => {
       user.resetpasswordtoken,
       user.resetpasswordtokenexpire,
     ]);
-
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
-  } 
+  }
 };
 
 const getResetPasswordToken = (user) => {
@@ -514,7 +509,6 @@ const getResetPasswordToken = (user) => {
 
   // Set token expire time
 
-  
   // ✅ Add 10 minutes to the current date
 
   let resetPasswordExpire = addMinutes(new Date(), 10);
@@ -538,13 +532,10 @@ const getResetPasswordToken = (user) => {
   return resetPasswordToken;
 };
 
-
 function addMinutes(date, minutes) {
   date.setMinutes(date.getMinutes() + minutes);
   return date;
 }
-
-
 
 // Replace these variables with your table and column definitions
 

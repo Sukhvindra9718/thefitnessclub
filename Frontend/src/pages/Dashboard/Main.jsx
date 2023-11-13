@@ -7,7 +7,7 @@ import StaffManagementOverview from './Pages/StaffManagementOverview'
 import ReportsOverview from './Pages/ReportsOverview'
 import OffersPackagesOverview from './Pages/OffersPackagesOverview'
 import { useSelector, useDispatch } from 'react-redux'
-import { getAllMembers} from '../../actions/userAction'
+import { getAllMembers} from '../../actions/gymOwnersAction'
 
 function Main({ active }) {
   const dispatch = useDispatch()

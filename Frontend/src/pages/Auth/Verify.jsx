@@ -1,11 +1,14 @@
+// eslint-disable-next-line
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import {verify} from "../../actions/gymOwnersAction"
+
 
 const Verify = ({ SetVerifyVisible, email }) => {
   const [otp, setOtp] = useState('')
   const dispatch = useDispatch()
-  const navigate = useNavigation()
+  const navigate = useNavigate()
   const data = useSelector((state) => state.verify)
 
   const handleVerifyVisibility = () => {
@@ -14,13 +17,15 @@ const Verify = ({ SetVerifyVisible, email }) => {
   }
 
   const handleVerify = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    dispatch(verify(email, otp))
   }
   const resendOtp = () => {}
   useEffect(() => {
     if (data.token) {
-      navigate('/completeprofiledetails')
+      navigate('/completeprofiledetails',{state:{id:data.token}})
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.token])
 
   return (
