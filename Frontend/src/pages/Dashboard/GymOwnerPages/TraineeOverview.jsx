@@ -7,7 +7,7 @@ import filterImg from '../../../../src/assets/filter.svg'
 import {GrSort} from "react-icons/gr"
 import axios from 'axios'
 import Cookies from 'js-cookie'
-
+import Loader from "../../../components/Loader.jsx"
 const list = ['Membership Active', 'Membership Pending','Attendance Inactive',"Attendance Active",'Current Month Payments','Clear Filter']
 const sortList = ['Newest Transaction', 'Oldest Transaction','Nearest Due Date',"Farthest Due Date",'Member ID (Low to High)','Member ID (High to Low)']
 
@@ -25,17 +25,21 @@ function TraineeOverview() {
   const [selectedDate, setSelectedDate] = React.useState('')
   const [data,setData] = React.useState([])
   const [trainees,setTrainees] = React.useState([])
-  
+  const [loading,setLoading] = React.useState(true)
   const totalPages = 5
 
   
-  const getAllTrainees = async () => {
+  const getAllTrainees = () => {
     const token = Cookies.get('token');
     const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
 
-    const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/trainee/getAllTrainee`, config)
-    setData(data.trainees);
-    setTrainees(data.trainees)
+    axios.get(`http://192.168.244.79:3001/api/v1/trainee/getAllTrainee`, config).then((response) => {
+      setData(response.data.trainees);
+      setTrainees(response.data.trainees);
+      setLoading(false);
+    }).catch((err) => {
+      console.log(err)
+    })
   }
 
   const handlePageChange = (page) => {
@@ -105,11 +109,11 @@ function TraineeOverview() {
     setData(filterData)
   }
   React.useEffect(() => {
-    getAllTrainees()
-  }, [data])
+    getAllTrainees();
+  }, [])
 
 
-  return (
+  return loading?(<Loader loading={loading}/>):(
     <div className="membership">
       <div className="filter-membership">
         <div className="filter-membership-container">

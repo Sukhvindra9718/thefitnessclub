@@ -16,11 +16,11 @@ router.route('/verify').post(verifyUser);
 router.route('/logout').post(Authentication,logoutUser);
 router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').post(resetPassword);
-router.route('/password/update').put(Authentication,authorizationGymTrainee(),updatePassword);
+router.route('/password/update').put(Authentication,authorizationGymTrainee,updatePassword);
 router.route('/update/profile').put(Authentication,uploadImage,updateProfile);
-router.route('/deleteUser/:id').delete(Authentication,authorizationGymTrainee(),deleteUser);
-router.route('/membership').post(Authentication,authorizationGymTrainee(),takeMembership);
+router.route('/deleteUser/:id').delete(Authentication,authorizationGymTrainee,deleteUser);
+router.route('/membership').post(Authentication,authorizationGymTrainee,takeMembership);
 
-router.route('/getAllTrainee').get(Authentication,authorizationGymOwner(),getAllTrainees);
+router.route('/getAllTrainee').get(authorizationGymOwner,getAllTrainees);
 router.get('/trainee/:userId/profile-image', getImage);
 module.exports = router;

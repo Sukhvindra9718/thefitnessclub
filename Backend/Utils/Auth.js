@@ -10,114 +10,103 @@ const pool = new Pool({
   password: process.env.PGPASSWORD,
   port: 5432, // Default PostgreSQL port
 });
-exports.authorizationGymOwner = () => {
-    return async(req, res, next) => {
-      const token = req.headers.authorization.split("Bearer ")[1];
-      if (!token) {
-          return next(new ErrorHandler("Login first to access this resource", 401));
-      }
+exports.authorizationGymOwner = CatchAsyncErrors(async (req, res, next) => {
+  const token = req.headers.authorization.split("Bearer ")[1];
 
-      const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-  
-    req.user = await getUserFromDatabase(
-      "email",
-      decodedData.id.split(".com")[0] + ".com"
-    );
-      if (req.user.role !== "gymOwner") {
-        return next(
-          new ErrorHandler(
-            `Role: ${req.user.role} is not allowed to access this resource `,
-            403
-          )
-        );
-      }
-  
-      next();
-    };
-  };
+  if (!token) {
+    return next(new ErrorHandler("Login first to access this resource", 401));
+  }
 
-
-exports.authorizationGymTrainee = () => {
-    return async(req, res, next) => {
-      const token = req.headers.authorization.split("Bearer ")[1];
-      if (!token) {
-          return next(new ErrorHandler("Login first to access this resource", 401));
-      }
-
-      const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-  
-    req.user = await getUserFromDatabase(
-      "email",
-      decodedData.id.split(".com")[0] + ".com"
-    );
-      if (req.user.role !== "gymTrainee") {
-        return next(
-          new ErrorHandler(
-            `Role: ${req.user.role} is not allowed to access this resource `,
-            403
-          )
-        );
-      }
-  
-      next();
-    };
-  };
-
-exports.authorizationGymTrainer = () => {
-    return async(req, res, next) => {
-      const token = req.headers.authorization.split("Bearer ")[1];
-      if (!token) {
-          return next(new ErrorHandler("Login first to access this resource", 401));
-      }
-      console.log(token)
-      const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-  
-    req.user = await getUserFromDatabase(
-      "email",
-      decodedData.id.split(".com")[0] + ".com"
-    );
-      if (req.user.role !== "gymTrainer") {
-        return next(
-          new ErrorHandler(
-            `Role: ${req.user.role} is not allowed to access this resource `,
-            403
-          )
-        );
-      }
-  
-      next();
-    };
-  };
-  
-
-exports.authorizationAdmin = () => {
-  return async(req, res, next) => {
-    const token = req.headers.authorization.split("Bearer ")[1];
-    if (!token) {
-        return next(new ErrorHandler("Login first to access this resource", 401));
-    }
-    console.log(token)
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
   req.user = await getUserFromDatabase(
     "email",
     decodedData.id.split(".com")[0] + ".com"
   );
-    if (req.user.role !== "gymOwner") {
-      return next(
-        new ErrorHandler(
-          `Role: ${req.user.role} is not allowed to access this resource `,
-          403
-        )
-      );
-    }
+  if (req.user.role !== "gymOwner") {
+    return next(
+      new ErrorHandler(
+        `Role: ${req.user.role} is not allowed to access this resource `,
+        403
+      )
+    );
+  }
+  return next();
+});
+exports.authorizationGymTrainee = CatchAsyncErrors(async (req, res, next) => {
+  const token = req.headers.authorization.split("Bearer ")[1];
 
-    next();
-  };
-};
+  if (!token) {
+    return next(new ErrorHandler("Login first to access this resource", 401));
+  }
+
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+  req.user = await getUserFromDatabase(
+    "email",
+    decodedData.id.split(".com")[0] + ".com"
+  );
+  if (req.user.role !== "trainee") {
+    return next(
+      new ErrorHandler(
+        `Role: ${req.user.role} is not allowed to access this resource `,
+        403
+      )
+    );
+  }
+  return next();
+});
+exports.authorizationGymTrainer = CatchAsyncErrors(async (req, res, next) => {
+  const token = req.headers.authorization.split("Bearer ")[1];
+
+  if (!token) {
+    return next(new ErrorHandler("Login first to access this resource", 401));
+  }
+
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+  req.user = await getUserFromDatabase(
+    "email",
+    decodedData.id.split(".com")[0] + ".com"
+  );
+  if (req.user.role !== "trainer") {
+    return next(
+      new ErrorHandler(
+        `Role: ${req.user.role} is not allowed to access this resource `,
+        403
+      )
+    );
+  }
+  return next();
+});
+exports.authorizationAdmin = CatchAsyncErrors(async (req, res, next) => {
+  const token = req.headers.authorization.split("Bearer ")[1];
+
+  if (!token) {
+    return next(new ErrorHandler("Login first to access this resource", 401));
+  }
+
+  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+
+  req.user = await getUserFromDatabase(
+    "email",
+    decodedData.id.split(".com")[0] + ".com"
+  );
+  if (req.user.role !== "admin") {
+    return next(
+      new ErrorHandler(
+        `Role: ${req.user.role} is not allowed to access this resource `,
+        403
+      )
+    );
+  }
+  return next();
+});
+
 
 exports.Authentication = CatchAsyncErrors(async (req, res, next) => {
   const token = req.headers.authorization.split("Bearer ")[1];
+  console.log("auth");
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
   }

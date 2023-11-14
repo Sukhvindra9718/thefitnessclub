@@ -10,7 +10,6 @@ import Cookies from 'js-cookie'
 function Sidebar({ active, setActive }) {
   const [user, setUser] = useState(null)
   useEffect(() => {
-    console.log("hi")
     const demo = Cookies.get('user')
     setUser(demo ? JSON.parse(demo) : null)
   }, [])
