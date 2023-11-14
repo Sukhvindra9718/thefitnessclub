@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {registerUser,loginUser,verifyUser,logoutUser,getUserDetail,forgotPassword,resetPassword,updatePassword,updateProfile,getAllUsers, deleteUser, takeMembership} = require('../Controllers/GymOwnerController');
-const {uploadImage} = require('../Utils/UploadImage');
+const {registerUser,loginUser,verifyUser,logoutUser,getUserDetail,forgotPassword,resetPassword,updatePassword,updateProfile,getAllUsers, deleteUser, takeMembership} = require('../Controllers/GymOwnerController.js');
+const {uploadImage} = require('../Utils/UploadImage.js');
 const {authorizationGymOwner,authorizationAdmin,authorizationGymTrainee,authorizationGymTrainer,Authentication} = require('../Utils/Auth.js');
+const { getImage } = require('../Utils/GetImage.js');
 
 // Common Routes
 router.route('/getUserDetail/:id').get(Authentication,getUserDetail);
@@ -32,4 +33,6 @@ router.route('/membership').post(Authentication,authorizationGymOwner(),takeMemb
 
 router.route('/getAllUsers').get(getAllUsers);
 
+
+router.get('/user/:userId/profile-image', getImage);
 module.exports = router;

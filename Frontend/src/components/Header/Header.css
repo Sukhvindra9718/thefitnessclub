@@ -1,10 +1,10 @@
 .Header {
-    /* border: 1px solid red; */
-    height: 10vw;
+    height: 5vw;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 2vw;
+    background-color: #8686d6;
 }
 
 .Header_Logo {
@@ -47,4 +47,46 @@
     font-weight: 600;
     cursor: pointer;
     color: white;
+}
+
+.profile-circle{
+    position: relative;
+}
+.profile-circle img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.profile-option{
+    position: absolute;
+    background-color: aliceblue;
+    left: -3.5rem;
+    padding: 0.5rem;
+}
+.profile-option h2{
+    color: black;
+    cursor: pointer;
+}
+
+.profile-circle{
+    position: relative;
+}
+.profile-circle img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.profile-option{
+    position: absolute;
+    background-color: aliceblue;
+    left: -3.5rem;
+    padding: 0.5rem;
+}
+.profile-option h2{
+    color: black;
+    cursor: pointer;
 }

@@ -1,15 +1,22 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import './Header.css'
 import SignIn from '../../pages/Auth/SignIn'
 import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
+import Cookies from 'js-cookie'
+
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
   const [verifyVisible, SetVerifyVisible] = useState(false)
   const [email, setEmail] = useState('')
+  const [profileImageSrc, setProfileImageSrc] = useState('')
+  const [profileOption, setProfileOption] = useState(false)
+  const [user, setUser] = useState()
+
+  const navigate = useNavigate()
 
   const handleSignInVisibility = () => {
     // Disable scrolling
@@ -22,6 +29,21 @@ function Header() {
     document.body.style.overflow = 'hidden'
     SetSignUpVisible((signUpVisible) => !signUpVisible)
   }
+
+  const handleLogout = () => {
+    Cookies.remove('user')
+    Cookies.remove('token')
+    window.location.reload(false)
+  }
+
+  useEffect(() => {
+    const demo = Cookies.get('user')
+    const imageUrl = Cookies.get('image')
+    setUser(demo ? JSON.parse(demo) : null)
+    setProfileImageSrc(imageUrl)
+  }, [])
+
+
   return (
     <>
       <div className="Header">
@@ -39,20 +61,55 @@ function Header() {
           <Link className="Link">Pages</Link>
           <Link className="Link">Contact</Link>
         </div>
-        <div className="Header_Auth">
-          <button
-            onClick={() => handleSignInVisibility()}
-            className="Header_Auth_SignIn Header_Auth_btn">
-            SignIn
-          </button>
-          <button
-            onClick={() => handleSignUpVisibility()}
-            className="Header_Auth_SignUp Header_Auth_btn">
-            SignUp
-          </button>
-        </div>
+        {!user ? (
+          <div className="Header_Auth">
+            <button
+              onClick={() => handleSignInVisibility()}
+              className="Header_Auth_SignIn Header_Auth_btn">
+              SignIn
+            </button>
+            <button
+              onClick={() => handleSignUpVisibility()}
+              className="Header_Auth_SignUp Header_Auth_btn">
+              SignUp
+            </button>
+          </div>
+        ) : (
+          <div className="profile-circle">
+            <img
+              className="profile-image"
+              onClick={() => setProfileOption(!profileOption)}
+              src={Cookies.get('image')}
+              alt="profile"
+            />
+            {profileOption && (
+              <div className="profile-option">
+                <div
+                  onClick={() =>
+                    navigate('/profile', {
+                      state: { profileImageSrc: profileImageSrc, user: user }
+                    })
+                  }>
+                  <h2>Profile</h2>
+                </div>
+                <div onClick={() => navigate('/dashboard')}>
+                  <h2>Dashboard</h2>
+                </div>
+                <div onClick={handleLogout}>
+                  <h2>Logout</h2>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-      {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} />}
+      {signInVisible && (
+        <SignIn
+          SetSignInVisible={SetSignInVisible}
+          setProfileImageSrc={setProfileImageSrc}
+          setUser={setUser}
+        />
+      )}
       {signUpVisible && (
         <SignUp
           SetSignUpVisible={SetSignUpVisible}

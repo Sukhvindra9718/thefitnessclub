@@ -26,15 +26,20 @@ connectDB();
 
 // Use Middlewares
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+app.use(cookieParser());
+
+// Define a route to get all cookies
 
 // Import all routes
-app.use("/api/v1", require("./Routes/UserRoutes"));
+app.use("/api/v1", require("./Routes/GymOwnerRoutes"));
+app.use("/api/v1/trainer", require("./Routes/TrainerRoutes"));
+app.use("/api/v1/trainee", require("./Routes/TraineeRoutes"));
+
 app.get("/password/reset/:token", (req, res) => {
   res.sendFile(__dirname + "/resetpassword.html");
 });

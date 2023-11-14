@@ -16,8 +16,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <BiCaretLeftCircle size={32} style={{cursor:"pointer"}}/>
       </div>
 
-      {pages.map((page) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+      {pages.map((page,index) => (
+        <div style={{ display: 'flex', alignItems: 'center' }} key={index}>
           {page < 4 && <button
             key={page}
             className={`page-item ${currentPage === page ? 'active' : ''}`}
