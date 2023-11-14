@@ -20,12 +20,13 @@ import {
   GET_ALL_TRAINERS_FAIL,
   GET_ALL_TRAINEE_REQUEST,
   GET_ALL_TRAINEE_SUCCESS,
-  GET_ALL_TRAINEE_FAIL,
+  GET_ALL_TRAINEE_FAIL
 } from '../constant/gymOwnersConstants'
 
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
+const IP = '192.168.0.107'
 // Admin Actions
 export const getAllMembers = () => async (dispatch) => {
   try {
@@ -33,7 +34,7 @@ export const getAllMembers = () => async (dispatch) => {
 
     const config = { headers: { 'Content-Type': 'application/json' } }
 
-    const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/getAllUsers`, config)
+    const { data } = await axios.get(`http://${IP}:3001/api/v1/getAllUsers`, config)
 
     dispatch({ type: GET_ALL_USER_SUCCESS, payload: data.gymOwners })
   } catch (error) {
@@ -46,119 +47,119 @@ export const login =
   ({ email, password }) =>
   async (dispatch) => {
     try {
-      const response = await fetch('http://192.168.0.107:3001/api/v1/login', {
+      const response = await fetch(`http://${IP}:3001/api/v1/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password }),
-      });
+        body: JSON.stringify({ email, password })
+      })
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json()
 
-        Cookies.set('token', data.token, { expires: 7 });
-        const demo = data.user;
+        Cookies.set('token', data.token, { expires: 7 })
+        const demo = data.user
         delete demo.profile_image
         delete demo.password
         const user = JSON.stringify(demo)
-  
-        Cookies.set('user',user, { expires: 7 });
-        dispatch({ type: LOGIN_SUCCESS, payload: data ? data: {} })
+
+        Cookies.set('user', user, { expires: 7 })
+        dispatch({ type: LOGIN_SUCCESS, payload: data ? data : {} })
       } else {
-        console.error('Login failed');
+        console.error('Login failed')
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', error)
     }
   }
 
-  export const register =
-  (formData) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: REGISTER_USER_REQUEST })
+export const register = (formData) => async (dispatch) => {
+  try {
+    dispatch({ type: REGISTER_USER_REQUEST })
 
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } }
+    const config = { headers: { 'Content-Type': 'multipart/form-data' } }
 
-      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/register`,formData,config)
+    const { data } = await axios.post(`http://${IP}:3001/api/v1/register`, formData, config)
 
-      dispatch({ type: REGISTER_USER_SUCCESS, payload: data.success })
-    } catch (error) {
-      dispatch({ type: REGISTER_USER_FAIL, payload: error.response})
-    }
+    dispatch({ type: REGISTER_USER_SUCCESS, payload: data.success })
+  } catch (error) {
+    dispatch({ type: REGISTER_USER_FAIL, payload: error.response })
   }
+}
 
-  export const verify =
-  (email, otp ) =>
-  async (dispatch) => {
-    try {
-      dispatch({ type: VERIFY_REQUEST })
+export const verify = (email, otp) => async (dispatch) => {
+  try {
+    dispatch({ type: VERIFY_REQUEST })
 
-      const config = { headers: { 'Content-Type': 'application/json' } }
+    const config = { headers: { 'Content-Type': 'application/json' } }
 
-      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/verify`,{ email, otp },config)
+    const { data } = await axios.post(`http://${IP}:3001/api/v1/verify`, { email, otp }, config)
 
-      dispatch({ type: VERIFY_SUCCESS, payload: data })
-    } catch (error) {
-      dispatch({ type: VERIFY_FAIL, payload: error.response})
-    }
+    dispatch({ type: VERIFY_SUCCESS, payload: data })
+  } catch (error) {
+    dispatch({ type: VERIFY_FAIL, payload: error.response })
   }
+}
 
-  export const getLoginUser = () => async (dispatch) => {
-    try {
-      dispatch({ type: GET_LOGIN_USER_REQUEST })
-      const token = Cookies.get('token');
-      const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
-  
-      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/getUserDetail/:id`, config);
- 
+export const getLoginUser = () => async (dispatch) => {
+  try {
+    dispatch({ type: GET_LOGIN_USER_REQUEST })
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    }
 
-      dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })
-    } catch (error) {
-      dispatch({ type: GET_LOGIN_USER_FAIL, payload: error.response })
-    }
-  }
+    const { data } = await axios.get(`http://${IP}:3001/api/v1/getUserDetail/:id`, config)
 
-  export const logout = () => async (dispatch) => {
-    try {
-      dispatch({ type: LOGOUT_REQUEST })
-  
-      const config = { headers: { 'Content-Type': 'application/json' } }
-  
-      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/logout`, config)
+    dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })
+  } catch (error) {
+    dispatch({ type: GET_LOGIN_USER_FAIL, payload: error.response })
+  }
+}
 
-      dispatch({ type: LOGOUT_SUCCESS, payload: data.user })
-    }
-    catch (error) {
-      dispatch({ type: LOGOUT_FAIL, payload: error.response })
-    }
+export const logout = () => async (dispatch) => {
+  try {
+    dispatch({ type: LOGOUT_REQUEST })
+
+    const config = { headers: { 'Content-Type': 'application/json' } }
+
+    const { data } = await axios.post(`http://${IP}:3001/api/v1/logout`, config)
+
+    dispatch({ type: LOGOUT_SUCCESS, payload: data.user })
+  } catch (error) {
+    dispatch({ type: LOGOUT_FAIL, payload: error.response })
   }
-  export const getAllTrainers = () => async (dispatch) => {
-    try {
-      dispatch({ type: GET_ALL_TRAINERS_REQUEST })
-  
-      const token = Cookies.get('token');
-      const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
-  
-      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/trainer/getAllTrainers`, config)
-      console.log("action",data)
-      dispatch({ type: GET_ALL_TRAINERS_SUCCESS, payload: data.trainers })
-    } catch (error) {
-      dispatch({ type: GET_ALL_TRAINERS_FAIL, payload: error?.response })
+}
+export const getAllTrainers = () => async (dispatch) => {
+  try {
+    dispatch({ type: GET_ALL_TRAINERS_REQUEST })
+
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     }
+
+    const { data } = await axios.get(`http://${IP}:3001/api/v1/trainer/getAllTrainers`, config)
+    console.log('action', data)
+    dispatch({ type: GET_ALL_TRAINERS_SUCCESS, payload: data.trainers })
+  } catch (error) {
+    dispatch({ type: GET_ALL_TRAINERS_FAIL, payload: error?.response })
   }
-  export const getAllTrainees = () => async (dispatch) => {
-    try {
-      dispatch({ type: GET_ALL_TRAINEE_REQUEST })
-  
-      const token = Cookies.get('token');
-      const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
-  
-      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/trainee/getAllTrainee`, config)
-  
-      dispatch({ type: GET_ALL_TRAINEE_SUCCESS, payload: data.trainees })
-    } catch (error) {
-      dispatch({ type: GET_ALL_TRAINEE_FAIL, payload: error.response })
+}
+export const getAllTrainees = () => async (dispatch) => {
+  try {
+    dispatch({ type: GET_ALL_TRAINEE_REQUEST })
+
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     }
+
+    const { data } = await axios.get(`http://${IP}:3001/api/v1/trainee/getAllTrainee`, config)
+
+    dispatch({ type: GET_ALL_TRAINEE_SUCCESS, payload: data.trainees })
+  } catch (error) {
+    dispatch({ type: GET_ALL_TRAINEE_FAIL, payload: error.response })
   }
+}
