@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import "./Style/Auth.css"
-import "../src/Style/Profile.css"
+import './Style/CompleteProfile.css'
 import App from './App'
 import { Provider } from 'react-redux'
 import store from './store.js'
