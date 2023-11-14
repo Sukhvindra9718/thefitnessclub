@@ -5,7 +5,7 @@ const SendEmail = require("../Utils/SendEmail.js");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
+
 // const { createTable } = require("../Utils/checkIfTableExists.js");
 
 const pool = new Pool({
@@ -17,21 +17,20 @@ const pool = new Pool({
 });
 
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, password, phoneNumber } = req.body;
-  const profileImage = req.file.buffer; // multer file buffer
-  const address = "";
+  const { firstname,lastname, email, dob, phoneNumber,address,pincode,state,city,country} = req.body;
+  console.log("req.body",req.body)
+  const profileImage = "fhghg"; // multer file buffer
 
   const otp = Math.floor(100000 + Math.random() * 900000);
-  const hashedPassword = await bcrypt.hash(password, 10);
-
+  const hashedPassword = await bcrypt.hash(otp.toString(), 10);
+  const gymOwnerId = 14;
   const isVerified = false;
-  // const createdAt = Date.now('YYYY-MM-DD');
-  const role = "gymOwner";
+  const role = "trainee";
   const resetPasswordToken = undefined;
   const resetPasswordTokenExpire = undefined;
-
+  const status = "active";
   const query =
-    "INSERT INTO users (name, email, password,phoneNumber,address,otp,isverified,role,profile_image,resetpasswordtoken,resetpasswordtokenexpire) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11)";
+    "INSERT INTO trainee (firstname,lastname, email, password,phonenumber,dob,address,pincode,state,city,otp,isverified,role,profile_image,resetpasswordtoken,resetpasswordtokenexpire,gymownerid,country,status) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)";
 
   // create html mail template with otp verification code
   const message = `<!DOCTYPE html>
@@ -87,17 +86,25 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
     `;
   try {
     await pool.query(query, [
-      name,
+      firstname,
+      lastname,
       email,
       hashedPassword,
       phoneNumber,
+      dob,
       address,
+      pincode,
+      state,
+      city,
       otp,
       isVerified,
       role,
       profileImage,
       resetPasswordToken,
       resetPasswordTokenExpire,
+      gymOwnerId,
+      country,
+      status
     ]);
 
     const result = await SendEmail({
@@ -161,7 +168,7 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
     try {
       const client = await pool.connect();
       const query =
-        "UPDATE users SET otp = $1, isverified = $2 WHERE email = $3";
+        "UPDATE trainee SET otp = $1, isverified = $2 WHERE email = $3";
       await client.query(query, ["", true, email]);
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
@@ -351,7 +358,7 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
   let password = await bcrypt.hash(req.body.newPassword, 10);
   try {
     const client = await pool.connect();
-    const query = "UPDATE users SET password = $1 WHERE email = $2";
+    const query = "UPDATE trainee SET password = $1 WHERE email = $2";
 
     await client.query(query, [password, req.user.email]);
   } catch (error) {
@@ -396,15 +403,15 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
-  let gymOwners = [];
+exports.getAllTrainees = CatchAsyncErrors(async (req, res, next) => {
+  let trainees = [];
   try {
     const client = await pool.connect();
-    const query = `SELECT * FROM users where role='gymOwner'`;
+    const query = `SELECT * FROM trainee where role='trainee'`;
     const result = await client.query(query, []);
 
     if (result.rows.length !== 0) {
-      gymOwners = result.rows;
+      trainees = result.rows;
     }
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
@@ -412,7 +419,7 @@ exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    gymOwners,
+    trainees,
   });
 });
 
@@ -420,7 +427,7 @@ exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
   const userId = req.params.id;
   try {
     const client = await pool.connect();
-    const query = `DELETE FROM users WHERE id = $1`;
+    const query = `DELETE FROM trainee WHERE id = $1`;
     await client.query(query, [userId]);
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
@@ -437,9 +444,9 @@ exports.takeMembership = CatchAsyncErrors(async (req, res, next) => {
 
   try {
     const client = await pool.connect();
-    // Update users table
+    // Update trainee table
     const query =
-      "UPDATE users SET membership_type = $1, membership_price = $2, membership_duration = $3 WHERE email = $4";
+      "UPDATE trainee SET membership_type = $1, membership_price = $2, membership_duration = $3 WHERE email = $4";
     await client.query(query, [
       membershipType,
       membershipPrice,
@@ -459,7 +466,7 @@ const getUserFromDatabase = async (findById, value) => {
   let user = null;
   try {
     const client = await pool.connect();
-    const query = `SELECT * FROM users WHERE ${findById} = $1`;
+    const query = `SELECT * FROM trainee WHERE ${findById} = $1`;
     const result = await client.query(query, [value]);
 
     if (result.rows.length !== 0) {
@@ -475,7 +482,7 @@ const updateUserInDatabase = async (user) => {
   try {
     const client = await pool.connect();
     const query =
-      "UPDATE users SET name = $1, email = $2, password = $3, phonenumber = $4, address = $5, otp = $6, isverified = $7, role = $8, profile_image = $9,createdat = $10, resetpasswordtoken = $11, resetpasswordtokenexpire = $12 WHERE email = $2";
+      "UPDATE trainee SET name = $1, email = $2, password = $3, phonenumber = $4, address = $5, otp = $6, isverified = $7, role = $8, profile_image = $9,createdat = $10, resetpasswordtoken = $11, resetpasswordtokenexpire = $12 WHERE email = $2";
 
     await client.query(query, [
       user.name,
@@ -540,11 +547,18 @@ function addMinutes(date, minutes) {
 
 // const columns = [
 //   { name: "id", type: "SERIAL PRIMARY KEY" },
-//   { name: "name", type: "VARCHAR(100) NOT NULL" },
+//   { name:"gymOwner_id",type:"INTEGER NOT NULL"},
+//   { name: "firstname", type: "VARCHAR(100) NOT NULL" },
+//   { name: "lastname", type: "VARCHAR(100) NOT NULL" },
 //   { name: "email", type: "VARCHAR(60) UNIQUE NOT NULL" },
 //   { name: "password", type: "VARCHAR(500) NOT NULL" },
 //   { name: "phoneNumber", type: "VARCHAR(10) NOT NULL" },
+//   { name: "dob",type:"DATE NOT NULL"},
 //   { name: "address", type: "VARCHAR(255) NOT NULL" },
+//   { name: "pincode", type: "VARCHAR(6) NOT NULL" },
+//   { name: "city", type: "VARCHAR(255) NOT NULL" },
+//   { name: "state", type: "VARCHAR(255) NOT NULL" },
+//   { name:"country",type:"VARCHAR(255) NOT NULL"},
 //   { name: "otp", type: "VARCHAR(8)" },
 //   { name: "isVerified", type: "BOOLEAN" },
 //   { name: "role", type: "VARCHAR(15)" },
@@ -553,7 +567,21 @@ function addMinutes(date, minutes) {
 //   { name: "resetPasswordToken", type: "VARCHAR(500)" },
 //   { name: "resetPasswordTokenExpire", type: "timestamptz" },
 // ];
+// createTable("traineePlansInfo", columns);
 
-// createTable("users", columns);
 
+// const columns = [
+//   { name: "id",type:"SERIAL PRIMARY KEY"},
+//   { name: "traineeId",type: "INTEGER NOT NULL"},
+//   { name: "plan",type: "VARCHAR(255) NOT NULL"},
+//   { name: "duration",type: "VARCHAR(255) NOT NULL"},
+//   { name: "groups",type: "VARCHAR(255) NOT NULL"},
+//   { name: "startdate",type:"DATE NOT NULL"},
+//   { name: "enddate",type:"DATE NOT NULL"},
+//   { name: "extentmembership",type:"INTEGER NOT NULL"},
+//   { name: "totalamount",type:"DECIMAL(10,2) NOT NULL"},
+//   { name: "modeofpayment",type:"VARCHAR(20) NOT NULL"},
+//   { name: "amountpaid",type:"DECIMAL(10, 2) NOT NULL"},
+// ]
 
+// createTable("traineePlansInfo", columns);

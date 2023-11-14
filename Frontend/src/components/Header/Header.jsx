@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Link,useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import './Header.css'
 import SignIn from '../../pages/Auth/SignIn'
@@ -7,16 +7,16 @@ import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
 import Cookies from 'js-cookie'
 
-
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
   const [verifyVisible, SetVerifyVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [profileImageSrc, setProfileImageSrc] = useState('')
-  const navigate = useNavigate();
-  const user = Cookies.get('user');
+  const [profileOption, setProfileOption] = useState(false)
+  const [user, setUser] = useState()
 
+  const navigate = useNavigate()
 
   const handleSignInVisibility = () => {
     // Disable scrolling
@@ -30,29 +30,18 @@ function Header() {
     SetSignUpVisible((signUpVisible) => !signUpVisible)
   }
 
-  useEffect(() => {
-    console.log(user.id)
-    const fetchProfileImage = async () => {
-      try {
-        const response = await fetch(
-          `http://192.168.244.79:3001/api/v1/user/${14}/profile-image`
-        )
-        if (response.ok) {
-          const blob = await response.blob()
-          const imageUrl = URL.createObjectURL(blob)
-          setProfileImageSrc(imageUrl)
-        } else {
-          console.error('Failed to fetch profile image.')
-        }
-      } catch (error) {
-        console.error('Error:', error)
-      }
-    }
+  const handleLogout = () => {
+    Cookies.remove('user')
+    Cookies.remove('token')
+    window.location.reload(false)
+  }
 
-    return () => {
-      fetchProfileImage()
-    }
-  }, [user.id])
+  useEffect(() => {
+    const demo = Cookies.get('user')
+    const imageUrl = Cookies.get('image')
+    setUser(demo ? JSON.parse(demo) : null)
+    setProfileImageSrc(imageUrl)
+  }, [])
 
 
   return (
@@ -87,11 +76,40 @@ function Header() {
           </div>
         ) : (
           <div className="profile-circle">
-            <img className="profile-image" src={profileImageSrc} alt="profile" onClick={()=> navigate('/profile',{state:{profileImageSrc:profileImageSrc,user:user}})}/>
+            <img
+              className="profile-image"
+              onClick={() => setProfileOption(!profileOption)}
+              src={Cookies.get('image')}
+              alt="profile"
+            />
+            {profileOption && (
+              <div className="profile-option">
+                <div
+                  onClick={() =>
+                    navigate('/profile', {
+                      state: { profileImageSrc: profileImageSrc, user: user }
+                    })
+                  }>
+                  <h2>Profile</h2>
+                </div>
+                <div onClick={() => navigate('/dashboard')}>
+                  <h2>Dashboard</h2>
+                </div>
+                <div onClick={handleLogout}>
+                  <h2>Logout</h2>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
-      {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} />}
+      {signInVisible && (
+        <SignIn
+          SetSignInVisible={SetSignInVisible}
+          setProfileImageSrc={setProfileImageSrc}
+          setUser={setUser}
+        />
+      )}
       {signUpVisible && (
         <SignUp
           SetSignUpVisible={SetSignUpVisible}

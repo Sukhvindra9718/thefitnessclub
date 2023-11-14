@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { login } from '../../actions/gymOwnersAction'
-import {useDispatch,useSelector} from "react-redux"
+import { login} from '../../actions/gymOwnersAction'
+import { useDispatch, useSelector } from 'react-redux'
+import Cookies from 'js-cookie'
 
 
-const SignIn = ({ SetSignInVisible }) => {
-  const dispatch = useDispatch();
-  const data = useSelector(state => state.auth)
+
+const SignIn = ({ SetSignInVisible, setProfileImageSrc,setUser}) => {
+  const dispatch = useDispatch()
+  const data = useSelector((state) => state.auth)
 
   const handleSignInVisibility = () => {
     document.body.style.overflow = 'auto'
@@ -22,19 +24,41 @@ const SignIn = ({ SetSignInVisible }) => {
     setFormData({ ...formData, [name]: value })
   }
 
-
   const handleSignIn = (e) => {
-    e.preventDefault();
-    console.log("click")
-    dispatch(login(formData));
+    e.preventDefault()
+    dispatch(login(formData))
   }
 
-  useEffect(()=>{
-    if(data.token){
-      window.location.href = "/dashboard"
+  useEffect(() => {
+    if (data.token) {
+      // eslint-disable-next-line
+      handleSignInVisibility();
+      const demo = Cookies.get('user')
+      const user = demo ? JSON.parse(demo) : null
+      setUser(user);
+      fetchProfileImage(user?.id)
+      // eslint-disable-next-line
     }
-  },[data.token])
+  }, [data.token])
 
+
+  const fetchProfileImage = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://192.168.244.79:3001/api/v1/user/${userId}/profile-image`
+      )
+      if (response.ok) {
+        const blob = await response.blob()
+        const imageUrl = URL.createObjectURL(blob)
+        Cookies.set('image',imageUrl)
+        setProfileImageSrc(imageUrl)
+      } else {
+        console.error('Failed to fetch profile image.')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
 
   return (
     <div className="Auth_Modal">
