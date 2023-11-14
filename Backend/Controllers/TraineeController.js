@@ -407,7 +407,7 @@ exports.getAllTrainees = CatchAsyncErrors(async (req, res, next) => {
   let trainees = [];
   try {
     const client = await pool.connect();
-    const query = `SELECT * FROM trainee where role='trainee'`;
+    const query = `SELECT * FROM trainee where gymownerid = ${req.user.id}`;
     const result = await client.query(query, []);
 
     if (result.rows.length !== 0) {
@@ -421,6 +421,7 @@ exports.getAllTrainees = CatchAsyncErrors(async (req, res, next) => {
     success: true,
     trainees,
   });
+
 });
 
 exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {

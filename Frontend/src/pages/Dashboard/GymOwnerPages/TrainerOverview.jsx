@@ -7,6 +7,7 @@ import filterImg from '../../../../src/assets/filter.svg'
 import { GrSort } from 'react-icons/gr'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import Loader from '../../../components/Loader.jsx'
 
 
 
@@ -28,8 +29,6 @@ const sortList = [
 ]
 
 function TrainerOverview() {
-
-
   const [currentPage, setCurrentPage] = React.useState(1)
   const [search, setSearch] = React.useState('')
   const [showfilter, setShowFilter] = React.useState(false)
@@ -40,14 +39,21 @@ function TrainerOverview() {
   const [data,setData] = React.useState([])
   const [trainers,setTrainers] = React.useState([])
   const totalPages = 5 // Replace with the actual total number of pages.
+  const [loading, setLoading] = React.useState(true);
 
-  const getAllTrainers = async () => {
+  const getAllTrainers = () => {
     const token = Cookies.get('token');
     const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
 
-    const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/trainer/getAllTrainers`, config)
-    setData(data.trainers);
-    setTrainers(data.trainers)
+    axios.get(`http://192.168.244.79:3001/api/v1/trainer/getAllTrainers`, config).then((response) => {
+      setData(response.data.trainers);
+      setTrainers(response.data.trainers)
+      setLoading(false);
+    }
+    ).catch((err) => {
+      console.log(err);
+    })
+
   }
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -115,13 +121,12 @@ function TrainerOverview() {
   const handleSearch = ()=>{
     const filterData = trainers.filter((item)=>item.firstname.toLowerCase().includes(search.toLowerCase()))
     setData(filterData)
-    console.log(filterData)
   }
 
   React.useEffect(() => {
     getAllTrainers();
-  }, [data])
-  return (
+  }, [])
+  return loading?(<Loader loading={loading}/>):(
     <div className="membership">
       <div className="filter-membership">
         <div className="filter-membership-container">

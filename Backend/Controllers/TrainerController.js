@@ -411,7 +411,7 @@ exports.getAllTrainers = CatchAsyncErrors(async (req, res, next) => {
   let trainers = [];
   try {
     const client = await pool.connect();
-    const query = `SELECT * FROM trainer where role='trainer'`;
+    const query = `SELECT * FROM trainer where gymowner_id= ${req.user.id}`;
     const result = await client.query(query, []);
 
     if (result.rows.length !== 0) {
