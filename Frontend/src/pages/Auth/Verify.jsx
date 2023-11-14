@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import {verify} from "../../actions/gymOwnersAction"
 
 
-const Verify = ({ SetVerifyVisible, email }) => {
+const Verify = ({ SetVerifyVisible, email,name,phoneNumber,image }) => {
   const [otp, setOtp] = useState('')
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -23,7 +23,7 @@ const Verify = ({ SetVerifyVisible, email }) => {
   const resendOtp = () => {}
   useEffect(() => {
     if (data.token) {
-      navigate('/completeprofiledetails',{state:{id:data.token}})
+      navigate('/completeprofiledetails',{state:{id:data.token,name:name,email:email,phoneNumber:phoneNumber,image:image}})
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.token])

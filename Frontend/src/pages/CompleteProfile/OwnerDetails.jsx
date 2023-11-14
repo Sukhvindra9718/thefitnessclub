@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { TbCameraUp } from 'react-icons/tb'
 
-const OwnerDetails = ({ handleSectionChange }) => {
+const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
     profileImage: '',
     AadharCard: '',
     DOB: ''
@@ -56,41 +53,43 @@ const OwnerDetails = ({ handleSectionChange }) => {
               type="text"
               name="name"
               placeholder="Full Name"
-              value={formData.name}
-              onChange={(e) => handleInputChange(e)}
+              value={name}
+              disabled="true"
             />
             <div className="Custom_ImageUploader_Preview_Container">
               <input
                 className="FileUploader"
                 type="file"
                 accept=".jpg, .png,"
-                onChange={handleFileChange}
+                // onChange={handleFileChange}
                 name="profileImage"
+                disabled="true"
               />
-              <img src={selectedFile} alt="Preview" className="Custom_ImageUploader_Preview" />
-              <TbCameraUp className="UploadImageIcon" />
+              <img src={image} alt="Preview" className="Custom_ImageUploader_Preview" />
+              {/* <TbCameraUp className="UploadImageIcon" /> */}
             </div>
             <input
               className="Auth_Input"
               type="text"
               name="phoneNumber"
               placeholder="Phone Number"
-              value={formData.phoneNumber}
-              onChange={(e) => handleInputChange(e)}
+              value={phoneNumber}
+              disabled="true"
             />
             <input
               className="SignUp_Email Auth_Input"
               type="text"
               name="email"
               placeholder="Email"
-              value={formData.email}
-              onChange={(e) => handleInputChange(e)}
+              value={email}
+              disabled="true"
             />
             <input
               className="Auth_Input"
               type="date"
               name="DOB"
               placeholder="Date of Birth"
+              aria-placeholder='Date of Birth'
               value={formData.DOB}
               onChange={(e) => handleInputChange(e)}
             />

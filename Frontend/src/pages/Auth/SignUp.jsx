@@ -3,7 +3,7 @@ import { register } from '../../actions/gymOwnersAction'
 import { useDispatch, useSelector } from 'react-redux'
 import { TbCameraUp } from 'react-icons/tb'
 
-const SignUp = ({ SetSignUpVisible, SetVerifyVisible, setEmail }) => {
+const SignUp = ({ SetSignUpVisible, SetVerifyVisible, setEmail,setName,setPhoneNumber,setImage }) => {
   const dispatch = useDispatch()
   const { registerStatus } = useSelector((state) => state.register)
 
@@ -63,6 +63,9 @@ const SignUp = ({ SetSignUpVisible, SetVerifyVisible, setEmail }) => {
       SetVerifyVisible((verifyVisible) => !verifyVisible)
       SetSignUpVisible((signUpVisible) => !signUpVisible)
       setEmail(formData.email)
+      setName(formData.name)
+      setPhoneNumber(formData.phoneNumber)
+      setImage(selectedFile)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registerStatus])

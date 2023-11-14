@@ -2,8 +2,11 @@ import React, { useState } from 'react'
 import GymDetails from './GymDetails'
 import PaymentDetails from './PaymentDetails'
 import OwnerDetails from './OwnerDetails'
+import { useLocation } from 'react-router-dom'
 
 function CompleteProfileDetails() {
+  const location = useLocation();
+  const {id,name,email,phoneNumber,image} = location.state
   const [activeSection, setActiveSection] = useState({
     OwnerDetails: true,
     GymDetails: false,
@@ -44,7 +47,7 @@ function CompleteProfileDetails() {
         </div>
       </div>
       <div className="activeSection">
-        {activeSection.OwnerDetails && <OwnerDetails handleSectionChange={handleSectionChange} />}
+        {activeSection.OwnerDetails && <OwnerDetails handleSectionChange={handleSectionChange} name={name} email={email} phoneNumber={phoneNumber} image={image}/>}
         {activeSection.GymDetails && <GymDetails handleSectionChange={handleSectionChange} />}
         {activeSection.PaymentDetails && (
           <PaymentDetails handleSectionChange={handleSectionChange} />
