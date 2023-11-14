@@ -8,9 +8,8 @@ import Verify from '../../pages/Auth/Verify'
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
-  const [verifyVisible,SetVerifyVisible] = useState(false)
-  const [email,setEmail] = useState('');
-
+  const [verifyVisible, SetVerifyVisible] = useState(false)
+  const [email, setEmail] = useState('')
 
   const handleSignInVisibility = () => {
     // Disable scrolling
@@ -41,7 +40,9 @@ function Header() {
           <Link className="Link">Contact</Link>
         </div>
         <div className="Header_Auth">
-          <button onClick={() => handleSignInVisibility()} className="Header_Auth_SignIn Header_Auth_btn">
+          <button
+            onClick={() => handleSignInVisibility()}
+            className="Header_Auth_SignIn Header_Auth_btn">
             SignIn
           </button>
           <button
@@ -52,8 +53,14 @@ function Header() {
         </div>
       </div>
       {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} />}
-      {signUpVisible && <SignUp SetSignUpVisible={SetSignUpVisible} SetVerifyVisible={SetVerifyVisible} setEmail={setEmail}/>}
-      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email}/>}
+      {signUpVisible && (
+        <SignUp
+          SetSignUpVisible={SetSignUpVisible}
+          SetVerifyVisible={SetVerifyVisible}
+          setEmail={setEmail}
+        />
+      )}
+      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email} />}
     </>
   )
 }

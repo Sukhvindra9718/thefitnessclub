@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { register, verify } from '../../actions/userAction';
-import { useDispatch,useSelector } from 'react-redux';
+import { register, verify } from '../../actions/userAction'
+import { useDispatch, useSelector } from 'react-redux'
+import { TbCameraUp } from 'react-icons/tb'
 
-
-const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
-  const dispatch = useDispatch();
-  const {registerStatus} = useSelector((state) => state.register);
-  
-
+const SignUp = ({ SetSignUpVisible, SetVerifyVisible, setEmail }) => {
+  const dispatch = useDispatch()
+  const { registerStatus } = useSelector((state) => state.register)
 
   // Logic for Show/Hide this Comp.
   const handleSignUpVisibility = () => {
@@ -31,38 +29,32 @@ const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
   }
   // Logic for Sign Up Form Submission
 
-
   const handleSignUp = (e) => {
-    const {name,email,password,confirmPassword,phoneNumber,profileImage} = formData;
+    const { name, email, password, confirmPassword, phoneNumber, profileImage } = formData
     e.preventDefault()
-    if(password !== confirmPassword){
-      alert("Password and Confirm Password are not same");
-      return;
+    if (password !== confirmPassword) {
+      alert('Password and Confirm Password are not same')
+      return
     }
-    const SignUpData = new FormData();
-    SignUpData.append('name', name);
-    SignUpData.append('email', email);
-    SignUpData.append('phoneNumber', phoneNumber);
-    SignUpData.append('profile_image', profileImage);
-    SignUpData.append('password', password);
+    const SignUpData = new FormData()
+    SignUpData.append('name', name)
+    SignUpData.append('email', email)
+    SignUpData.append('phoneNumber', phoneNumber)
+    SignUpData.append('profile_image', profileImage)
+    SignUpData.append('password', password)
     dispatch(register(SignUpData))
   }
 
   // Logic for Image Uploader
   const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
-  const [selectedFileName, setSelectedFileName] = useState(null)
-
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
       setSelectedFile(URL.createObjectURL(file))
-      setSelectedFileName(file.name)
       setFormData({ ...formData, profileImage: file })
-
     } else {
-      setSelectedFile(null)
-      setSelectedFileName(null)
+      setSelectedFile('./DefaultUser.svg')
     }
   }
 
@@ -72,7 +64,7 @@ const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
       SetSignUpVisible((signUpVisible) => !signUpVisible)
       setEmail(formData.email)
     }
-  }, [registerStatus]);
+  }, [registerStatus])
   return (
     <div className="Auth_Modal">
       <div className="SignUp_Container Auth_Container">
@@ -93,15 +85,6 @@ const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
               onChange={handleInputChange}
             />
             <div className="Custom_ImageUploader_Preview_Container">
-              <img src={selectedFile} alt="Preview" className="Custom_ImageUploader_Preview" />
-            </div>
-            <div className="Custom_ImageUploader">
-              <input
-                className="Auth_Input"
-                type="text"
-                value={selectedFileName}
-                placeholder={'Profile Image'}
-              />
               <input
                 className="FileUploader"
                 type="file"
@@ -109,6 +92,8 @@ const SignUp = ({ SetSignUpVisible,SetVerifyVisible,setEmail }) => {
                 onChange={handleFileChange}
                 name="profileImage"
               />
+              <img src={selectedFile} alt="Preview" className="Custom_ImageUploader_Preview" />
+              <TbCameraUp className="UploadImageIcon" />
             </div>
             <input
               className="Auth_Input"

@@ -4,8 +4,10 @@
     --primary-color: #f36100;
     --secondary-color: #f5f5f5;
     --primary-color-dark: #d35400;
+    --bg-gray-light: #f5f5f5;
     --bg-gray: rgb(227, 227, 227);
     --bg-gray-2: rgb(224, 224, 224);
+    --bg-logo: #364f52
 
 }
 
@@ -13,12 +15,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: white;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: black;
 }
 
 .Layout {
@@ -26,6 +26,7 @@ body {
     background-image: url('../public/hero-1.jpg');
     background-position: 40% 20%;
     background-repeat: no-repeat;
+    
 }
 
 .Home {
