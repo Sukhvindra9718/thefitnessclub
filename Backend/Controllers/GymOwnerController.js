@@ -127,9 +127,9 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email", email);
-  
+  console.log(user)
   //Checks if password is correct or not
-  if (user.isVerified === false) {
+  if (user.isverified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
   }
   const isPasswordMatched = await bcrypt.compare(password, user.password);
@@ -465,8 +465,9 @@ const getUserFromDatabase = async (findById, value) => {
     if (result.rows.length !== 0) {
       user = result.rows[0];
     }
+    console.log(user)
   } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
+    return new ErrorHandler(error.message, 400);
   }
   return user;
 };
@@ -492,7 +493,7 @@ const updateUserInDatabase = async (user) => {
       user.resetpasswordtokenexpire,
     ]);
   } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
+    return new ErrorHandler(error.message, 400);
   }
 };
 
