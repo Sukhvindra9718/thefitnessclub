@@ -12,10 +12,12 @@ function Header() {
   const [signUpVisible, SetSignUpVisible] = useState(false)
   const [verifyVisible, SetVerifyVisible] = useState(false)
   const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
   const [profileImageSrc, setProfileImageSrc] = useState('')
   const [profileOption, setProfileOption] = useState(false)
   const [user, setUser] = useState()
-
+  const [image, setImage] = useState('')
   const navigate = useNavigate()
 
   const handleSignInVisibility = () => {
@@ -115,9 +117,12 @@ function Header() {
           SetSignUpVisible={SetSignUpVisible}
           SetVerifyVisible={SetVerifyVisible}
           setEmail={setEmail}
+          setName={setName}
+          setPhoneNumber={setPhoneNumber}
+          setImage={setImage}
         />
       )}
-      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email} />}
+      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email} name={name} phoneNumber={phoneNumber} image={image}/>}
     </>
   )
 }
