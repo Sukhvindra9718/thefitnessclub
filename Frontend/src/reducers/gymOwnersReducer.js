@@ -17,6 +17,12 @@ import {
     GET_LOGIN_USER_REQUEST,
     GET_LOGIN_USER_SUCCESS,
     GET_LOGIN_USER_FAIL,
+    GET_ALL_TRAINEE_FAIL,
+    GET_ALL_TRAINEE_REQUEST,
+    GET_ALL_TRAINEE_SUCCESS,
+    GET_ALL_TRAINERS_FAIL,
+    GET_ALL_TRAINERS_REQUEST,
+    GET_ALL_TRAINERS_SUCCESS,
     CLEAR_ERRORS,
   } from "../constant/gymOwnersConstants";
   
@@ -383,3 +389,65 @@ import {
         return state;
     }
   }
+  export const allGymTrainersReducer = (state = { gymOwners: [] }, action) => {
+    switch (action.type) {
+      case GET_ALL_TRAINERS_REQUEST:
+        return {
+          ...state,
+          loading: true,
+        };
+      case GET_ALL_TRAINERS_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          trainers: action.payload,
+        };
+  
+      case GET_ALL_TRAINERS_FAIL:
+        return {
+          ...state,
+          loading: false,
+          error: action.payload,
+        };
+  
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+        };
+  
+      default:
+        return state;
+    }
+  };
+  export const allGymTraineesReducer = (state = { gymOwners: [] }, action) => {
+    switch (action.type) {
+      case GET_ALL_TRAINEE_REQUEST:
+        return {
+          ...state,
+          loading: true,
+        };
+      case GET_ALL_TRAINEE_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          trainees: action.payload,
+        };
+  
+      case GET_ALL_TRAINEE_FAIL:
+        return {
+          ...state,
+          loading: false,
+          error: action.payload,
+        };
+  
+      case CLEAR_ERRORS:
+        return {
+          ...state,
+          error: null,
+        };
+  
+      default:
+        return state;
+    }
+  };

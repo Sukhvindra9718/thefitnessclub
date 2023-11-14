@@ -110,7 +110,7 @@
     display: flex;
     gap: 1rem;
     align-items: center;
-    padding: 2rem;
+    padding: 2rem 0.5rem;
 }
 .table-container{
     width: 100%;
@@ -142,11 +142,11 @@
     text-align: center;
 }
 .item3{
-    width: 10%;
+    width: 12%;
     text-align: center;
 }
 .item4{
-    width: 30%;
+    width: 25%;
     text-align: center;
 }
 .item5{
@@ -181,7 +181,7 @@
     background-color: #99b3cc;
 } */
 .table-row h1{
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 500;
     color: #717171;
     margin: 0;
@@ -330,7 +330,9 @@
     width: 40%;
     height: 50px;
     display: flex;
+    flex-direction: row;
     align-items: center;
+    gap: 3rem;
 }
 
 .filter-membership-item{
@@ -381,7 +383,7 @@
 .filter-dropdown{
     position: absolute;
     width: 200px;
-    left: -135px;
+    left: -150px;
     top: 40px;
 }
 
@@ -461,5 +463,26 @@
     outline: none;
     color: #000;
     font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.add-btn{
+    background-color: var(--primary-color);
+    width: fit-content;
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: 0.5rem;
+    -webkit-border-radius: 0.5rem;
+    -moz-border-radius: 0.5rem;
+    -ms-border-radius: 0.5rem;
+    -o-border-radius: 0.5rem;
+}
+.add-btn h1{
+    color: white;
+    font-weight: 600;
     cursor: pointer;
 }

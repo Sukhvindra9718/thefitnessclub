@@ -8,7 +8,7 @@ import {GrSort} from "react-icons/gr"
 
 const list = ['Membership Active', 'Membership Pending','Attendance Inactive',"Attendance Active",'Current Month Payments','Clear Filter']
 const sortList = ['Newest Transaction', 'Oldest Transaction','Nearest Due Date',"Farthest Due Date",'Member ID (Low to High)','Member ID (High to Low)']
-function Membership_Overview() {
+function Membership_Overview({gymOwners}) {
   // eslint-disable-next-line
   const [allMembers, setAllMembers] = React.useState([1, 2, 3, 4, 5])
   const [currentPage, setCurrentPage] = React.useState(1)
@@ -120,10 +120,10 @@ function Membership_Overview() {
           </div>
         </div>
         <div className="table-body">
-          {allMembers.map((item, index) => (
+          {gymOwners.map((item, index) => (
             <div className="table-row" key={index}>
               <div className="item2 item">
-                <h1>123456</h1>
+                <h1>{item.id}</h1>
               </div>
               <div className="item1 item">
                 <div>
@@ -134,13 +134,13 @@ function Membership_Overview() {
                   />
                 </div>
                 <div>
-                  <h1>John Doe</h1>
-                  <p>9643315148</p>
+                  <h1>{item.name}</h1>
+                  <p>{item.phonenumber}</p>
                 </div>
               </div>
               <div className="item3 item">
                 <div className="plan">
-                  <p>Monthly</p>
+                  <p>{item.membership_duration/30}</p>
                   <Link to="/dashboard/membership/plan">Change Plan</Link>
                 </div>
               </div>
@@ -155,7 +155,7 @@ function Membership_Overview() {
                       alignItems: 'center'
                     }}>
                     <p>Next Due Date</p>
-                    <h3>12/12/2020</h3>
+                    <h3>{item.prebookeddate}</h3>
                   </div>
                   <div className="divider"></div>
                   <div
@@ -167,14 +167,14 @@ function Membership_Overview() {
                       alignItems: 'center'
                     }}>
                     <p>Pre Booked Due Date</p>
-                    <h3>12/12/2020</h3>
+                    <h3>{item.prebookeddate}</h3>
                   </div>
                 </div>
               </div>
               <div className="item5 item">
                 <div className="status-badge">
                   <div className="circle"></div>
-                  <h1>Active</h1>
+                  <h1>{item.status}</h1>
                 </div>
               </div>
               <div className="item6 item">

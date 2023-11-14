@@ -118,7 +118,6 @@ exports.authorizationAdmin = () => {
 
 exports.Authentication = CatchAsyncErrors(async (req, res, next) => {
   const token = req.headers.authorization.split("Bearer ")[1];
-
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
   }

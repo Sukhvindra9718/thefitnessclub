@@ -12,16 +12,12 @@ const sendToken = (user, statusCode, res) => {
       ),
       httpOnly: true,
     };
-    // res.statusCode(statusCode).cookie("token", token, {options});
-    // res.json({
-    //   success: true,
-    //   token,
-    // });
-    // console.log("token1",token)
+
     try {
       res.status(statusCode).cookie("token", token, options).json({
         success: true,
         token,
+        user
       });
     } catch (error) {
       console.error('Error setting cookie:', error);
