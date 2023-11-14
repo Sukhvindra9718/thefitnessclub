@@ -33,7 +33,7 @@ export const getAllMembers = () => async (dispatch) => {
 
     const config = { headers: { 'Content-Type': 'application/json' } }
 
-    const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/getAllUsers`, config)
+    const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/getAllUsers`, config)
 
     dispatch({ type: GET_ALL_USER_SUCCESS, payload: data.gymOwners })
   } catch (error) {
@@ -46,7 +46,7 @@ export const login =
   ({ email, password }) =>
   async (dispatch) => {
     try {
-      const response = await fetch('http://192.168.244.79:3001/api/v1/login', {
+      const response = await fetch('http://192.168.0.107:3001/api/v1/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ export const login =
 
       const config = { headers: { 'Content-Type': 'multipart/form-data' } }
 
-      const { data } = await axios.post(`http://192.168.244.79:3001/api/v1/register`,formData,config)
+      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/register`,formData,config)
 
       dispatch({ type: REGISTER_USER_SUCCESS, payload: data.success })
     } catch (error) {
@@ -97,7 +97,7 @@ export const login =
 
       const config = { headers: { 'Content-Type': 'application/json' } }
 
-      const { data } = await axios.post(`http://192.168.244.79:3001/api/v1/verify`,{ email, otp },config)
+      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/verify`,{ email, otp },config)
 
       dispatch({ type: VERIFY_SUCCESS, payload: data })
     } catch (error) {
@@ -111,7 +111,7 @@ export const login =
       const token = Cookies.get('token');
       const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
   
-      const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/getUserDetail/:id`, config);
+      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/getUserDetail/:id`, config);
  
 
       dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })
@@ -126,7 +126,7 @@ export const login =
   
       const config = { headers: { 'Content-Type': 'application/json' } }
   
-      const { data } = await axios.post(`http://192.168.244.79:3001/api/v1/logout`, config)
+      const { data } = await axios.post(`http://192.168.0.107:3001/api/v1/logout`, config)
 
       dispatch({ type: LOGOUT_SUCCESS, payload: data.user })
     }
@@ -141,7 +141,7 @@ export const login =
       const token = Cookies.get('token');
       const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
   
-      const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/trainer/getAllTrainers`, config)
+      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/trainer/getAllTrainers`, config)
       console.log("action",data)
       dispatch({ type: GET_ALL_TRAINERS_SUCCESS, payload: data.trainers })
     } catch (error) {
@@ -155,7 +155,7 @@ export const login =
       const token = Cookies.get('token');
       const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
   
-      const { data } = await axios.get(`http://192.168.244.79:3001/api/v1/trainee/getAllTrainee`, config)
+      const { data } = await axios.get(`http://192.168.0.107:3001/api/v1/trainee/getAllTrainee`, config)
   
       dispatch({ type: GET_ALL_TRAINEE_SUCCESS, payload: data.trainees })
     } catch (error) {

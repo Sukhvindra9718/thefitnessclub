@@ -6,7 +6,7 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-// const { createTable } = require("../Utils/checkIfTableExists.js");
+const { createTable } = require("../Utils/checkIfTableExists.js");
 
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -18,6 +18,7 @@ const pool = new Pool({
 
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phoneNumber } = req.body;
+  console.log(req.body)
   const profileImage = req.file.buffer; // multer file buffer
   const address = "";
 
