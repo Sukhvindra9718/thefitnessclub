@@ -5,8 +5,8 @@ const SendEmail = require("../Utils/SendEmail.js");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
-const { createTable } = require("../Utils/checkIfTableExists.js");
+// const jwt = require("jsonwebtoken");
+// const { createTable } = require("../Utils/checkIfTableExists.js");
 
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -18,7 +18,7 @@ const pool = new Pool({
 
 exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phoneNumber } = req.body;
-  console.log(req.body)
+
   const profileImage = req.file.buffer; // multer file buffer
   const address = "";
 
@@ -128,7 +128,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email", email);
-  console.log(user)
+  console.log(user);
   //Checks if password is correct or not
   if (user.isverified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
@@ -166,9 +166,7 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
       await client.query(query, ["", true, email]);
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
-    } finally {
-      pool.end(); // Close the pool when done
-    }
+    } 
     sendToken(user, 200, res);
   } else {
     return next(new ErrorHandler("Invalid otp", 401));
@@ -396,6 +394,49 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
     message: "Profile updated successfully",
   });
 });
+exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
+  const {
+    AadharCard,
+    DOB,
+    GymAdd,
+    GymName,
+    GymRegNum,
+    membershipType,
+    membershipDuration,
+    membershipPrice,
+    Address1,
+    Address2,
+  } = req.body;
+  const status = 'active';
+  const address = Address1 + " " + Address2;
+  const prebookeddate = new Date();
+  const GymLogo = req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
+
+
+  const query = `UPDATE users SET gymlogo = $1, gymregnum = $2, gymname = $3, gymadd = $4, adhaarcardno = $5, membership_type=$6,membership_price=$7,membership_duration = $8,status=$9,address=$10,dob= $11,prebookeddate=$12 WHERE email = $13`;
+
+
+  await pool.query(query, [
+    GymLogo,
+    GymRegNum,
+    GymName,
+    GymAdd,
+    AadharCard,
+    membershipType,
+    membershipPrice,
+    membershipDuration,
+    status,
+    address,
+    DOB,
+    prebookeddate,
+    req.user.email,
+  ]);
+
+  res.status(200).json({
+    success: true,
+    message: "Profile Completed",
+  });
+});
 
 exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
   let gymOwners = [];
@@ -466,7 +507,7 @@ const getUserFromDatabase = async (findById, value) => {
     if (result.rows.length !== 0) {
       user = result.rows[0];
     }
-    console.log(user)
+    console.log(user);
   } catch (error) {
     return new ErrorHandler(error.message, 400);
   }
@@ -557,5 +598,3 @@ function addMinutes(date, minutes) {
 // ];
 
 // createTable("users", columns);
-
-

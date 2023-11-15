@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {registerUser,loginUser,verifyUser,logoutUser,getUserDetail,forgotPassword,resetPassword,updatePassword,updateProfile,getAllUsers, deleteUser, takeMembership} = require('../Controllers/GymOwnerController.js');
+const {registerUser,loginUser,verifyUser,logoutUser,getUserDetail,forgotPassword,resetPassword,updatePassword,updateProfile,getAllUsers, deleteUser, takeMembership,completeProfile} = require('../Controllers/GymOwnerController.js');
 const {uploadImage} = require('../Utils/UploadImage.js');
 const {authorizationGymOwner,authorizationAdmin,Authentication} = require('../Utils/Auth.js');
 const { getImage } = require('../Utils/GetImage.js');
@@ -20,6 +20,7 @@ router.route('/password/update').put(Authentication,authorizationGymOwner,update
 router.route('/update/profile').put(Authentication,uploadImage,updateProfile);
 router.route('/deleteUser/:id').delete(Authentication,authorizationGymOwner,deleteUser);
 router.route('/membership').post(Authentication,authorizationGymOwner,takeMembership);
+router.route('/complete/profile').put(Authentication,uploadImage,completeProfile);
 
 
 // Gym Trainer Routes
@@ -29,9 +30,7 @@ router.route('/membership').post(Authentication,authorizationGymOwner,takeMember
 
 
 // Admin Routes
-// router.route('/getAllUsers').get(Authentication,authorizationAdmin(),getAllUsers);
-
-router.route('/getAllUsers').get(getAllUsers);
+router.route('/getAllUsers').get(authorizationAdmin,getAllUsers);
 
 
 router.get('/user/:userId/profile-image', getImage);
