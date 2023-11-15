@@ -26,7 +26,7 @@ import {
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const IP = '192.168.0.107'
+const IP = '192.168.244.79'
 // Admin Actions
 export const getAllMembers = () => async (dispatch) => {
   try {
@@ -95,7 +95,13 @@ export const verify = (email, otp) => async (dispatch) => {
     const config = { headers: { 'Content-Type': 'application/json' } }
 
     const { data } = await axios.post(`http://${IP}:3001/api/v1/verify`, { email, otp }, config)
+    Cookies.set('token', data.token, { expires: 7 })
+    const demo = data.user
+    delete demo.profile_image
+    delete demo.password
+    const user = JSON.stringify(demo)
 
+    Cookies.set('user', user, { expires: 7 })
     dispatch({ type: VERIFY_SUCCESS, payload: data })
   } catch (error) {
     dispatch({ type: VERIFY_FAIL, payload: error.response })
