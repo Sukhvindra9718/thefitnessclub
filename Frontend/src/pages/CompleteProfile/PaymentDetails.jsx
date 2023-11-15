@@ -1,52 +1,46 @@
 import React, { useState } from 'react'
-import { TbCameraUp } from 'react-icons/tb'
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
 
-const PaymentDetails = ({ handleSectionChange }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    profileImage: '',
-    AadharCard: '',
-    DOB: ''
-  })
-  const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setSelectedFile(URL.createObjectURL(file))
-      setFormData({ ...formData, profileImage: file })
-    } else {
-      setSelectedFile('./DefaultUser.svg')
-    }
-  }
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-  }
-
-  //   Next Page
-  const NextPage = () => {
-    handleSectionChange('OwnerDetails')
-  }
-
+const PaymentDetails = ({ handleSectionChange, formData,token }) => {
+  const [membershipPrice, setMembershipPrice] = useState(19.99)
+  const [membershipDuration, setMembershipDuration] = useState('Monthly')
+  const [membershipType, setMembershipType] = useState('Light');
+  const navigate = useNavigate();
   // Prev page
   const PrevPage = () => {
     handleSectionChange('GymDetails')
   }
 
   const handleGymDetailsData = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    const newForm = new FormData();
+    newForm.append('AadharCard',formData.AadharCard);
+    newForm.append('DOB',formData.DOB); 
+    newForm.append('GymName',formData.GymName);
+    newForm.append('profile_image',formData.GymLogo);
+    newForm.append('GymRegNum',formData.GymRegNum);
+    newForm.append('GymAdd',formData.GymAdd);
+    newForm.append('Address1',formData.Address1);
+    newForm.append('Address2',formData.Address2);
+    newForm.append('membershipDuration',membershipDuration);
+    newForm.append('membershipPrice',membershipPrice);
+    newForm.append('membershipType',membershipType);
 
-    // Add the dispatching logic here
-
-    // Move to the next page
-    NextPage()
+    const config = {
+      headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+    }
+    axios
+      .put('http://192.168.244.79:3001/api/v1/complete/profile', newForm, config)
+      .then((res) => {
+        if(res.data.success){
+          navigate('/dashboard')
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
   return (
     <div className="Section">
@@ -55,7 +49,13 @@ const PaymentDetails = ({ handleSectionChange }) => {
       </div>
       <div className="SectionForm">
         <div class="container">
-          <div class="card light">
+          <div
+            class="card light"
+            onClick={() => {
+              setMembershipPrice(19.99)
+              setMembershipDuration('Monthly')
+              setMembershipType('Light')
+            }}>
             <h2>Light Plan</h2>
             <p class="price">$19.99</p>
             <p class="duration">Per Month</p>
@@ -67,7 +67,13 @@ const PaymentDetails = ({ handleSectionChange }) => {
             </ul>
           </div>
 
-          <div class="card pro">
+          <div
+            class="card pro"
+            onClick={() => {
+              setMembershipPrice(39.99)
+              setMembershipDuration('Monthly')
+              setMembershipType('Pro')
+            }}>
             <h2>Pro Plan</h2>
             <p class="price">$39.99</p>
             <p class="duration">Per Month</p>
@@ -79,7 +85,13 @@ const PaymentDetails = ({ handleSectionChange }) => {
             </ul>
           </div>
 
-          <div class="card advanced">
+          <div
+            class="card advanced"
+            onClick={() => {
+              setMembershipPrice(59.99)
+              setMembershipDuration('Monthly')
+              setMembershipType('Advanced')
+            }}>
             <h2>Advanced Plan</h2>
             <p class="price">$59.99</p>
             <p class="duration">Per Month</p>
@@ -93,8 +105,9 @@ const PaymentDetails = ({ handleSectionChange }) => {
         </div>
         <div class="pricing-container">
           <div class="price-section">
-            <h2>$29.99</h2>
-            <p>Monthly Membership</p>
+            <h2>${membershipPrice}</h2>
+            <p>{membershipDuration} Membership</p>
+            <p>{membershipType} Plan</p>
           </div>
 
           <div class="payment-section">
@@ -106,7 +119,7 @@ const PaymentDetails = ({ handleSectionChange }) => {
             Previous
           </button>
           <button type="button" onClick={handleGymDetailsData}>
-            Save & Next
+            Submit
           </button>
         </div>
       </div>

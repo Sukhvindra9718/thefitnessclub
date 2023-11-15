@@ -1,20 +1,19 @@
 import React, { useState } from 'react'
 import { TbCameraUp } from 'react-icons/tb'
 
-const GymDetails = ({ handleSectionChange }) => {
-  const [formData, setFormData] = useState({
-    GymName: '',
-    GymLogo: '',
-    GymRegNum: '',
-    GymAdd: ''
-  })
-  const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
+const GymDetails = ({ handleSectionChange, formData, setFormData,selectedFile,setSelectedFile }) => {
+  
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
       setSelectedFile(URL.createObjectURL(file))
-      setFormData({ ...formData, profileImage: file })
+
+      setFormData({
+        ...formData,
+        [e.target.name]: file
+      })
+      console.log(formData.GymLogo)
     } else {
       setSelectedFile('./DefaultUser.svg')
     }
@@ -45,6 +44,7 @@ const GymDetails = ({ handleSectionChange }) => {
     NextPage()
   }
 
+  
   return (
     <div className="Section">
       <div className="SubSection">
@@ -58,7 +58,7 @@ const GymDetails = ({ handleSectionChange }) => {
               type="text"
               name="GymName"
               placeholder="Gym Name"
-              value={formData.name}
+              value={formData.GymName}
               onChange={(e) => handleInputChange(e)}
             />
             <div className="Custom_ImageUploader_Preview_Container">
@@ -67,7 +67,7 @@ const GymDetails = ({ handleSectionChange }) => {
                 type="file"
                 accept=".jpg, .png,"
                 onChange={handleFileChange}
-                name="profileImage"
+                name="GymLogo"
               />
               <img src={selectedFile} alt="Preview" className="Custom_ImageUploader_Preview" />
               <TbCameraUp className="UploadImageIcon" />
@@ -78,7 +78,7 @@ const GymDetails = ({ handleSectionChange }) => {
               type="text"
               name="GymRegNum"
               placeholder="GYM Registration Number"
-              value={formData.AadharCard}
+              value={formData.GymRegNum}
               onChange={(e) => handleInputChange(e)}
             />
             <input
@@ -86,7 +86,7 @@ const GymDetails = ({ handleSectionChange }) => {
               type="text"
               name="GymAdd"
               placeholder="GYM Address"
-              value={formData.DOB}
+              value={formData.GymAdd}
               onChange={(e) => handleInputChange(e)}
             />
           </div>

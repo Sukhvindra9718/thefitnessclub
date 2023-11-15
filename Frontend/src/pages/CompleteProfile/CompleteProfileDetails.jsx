@@ -6,7 +6,18 @@ import { useLocation } from 'react-router-dom'
 
 function CompleteProfileDetails() {
   const location = useLocation();
-  const {id,name,email,phoneNumber,image} = location.state
+  const {id,name,email,phoneNumber,image} = location.state;
+  const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
+  const [formData, setFormData] = useState({
+    AadharCard: '',
+    DOB: '',
+    GymName: '',
+    GymLogo: '',
+    GymRegNum: '',
+    GymAdd: '',
+    Address1:'',
+    Address2:'',
+  })
   const [activeSection, setActiveSection] = useState({
     OwnerDetails: true,
     GymDetails: false,
@@ -47,10 +58,10 @@ function CompleteProfileDetails() {
         </div>
       </div>
       <div className="activeSection">
-        {activeSection.OwnerDetails && <OwnerDetails handleSectionChange={handleSectionChange} name={name} email={email} phoneNumber={phoneNumber} image={image}/>}
-        {activeSection.GymDetails && <GymDetails handleSectionChange={handleSectionChange} />}
+        {activeSection.OwnerDetails && <OwnerDetails handleSectionChange={handleSectionChange} name={name} email={email} phoneNumber={phoneNumber} image={image} formData={formData} setFormData={setFormData}/>}
+        {activeSection.GymDetails && <GymDetails handleSectionChange={handleSectionChange} formData={formData} setFormData={setFormData} selectedFile={selectedFile} setSelectedFile={setSelectedFile}/>}
         {activeSection.PaymentDetails && (
-          <PaymentDetails handleSectionChange={handleSectionChange} />
+          <PaymentDetails handleSectionChange={handleSectionChange} token={id} formData={formData}/>
         )}
       </div>
     </div>

@@ -1,24 +1,14 @@
 import React, { useState } from 'react'
-import { TbCameraUp } from 'react-icons/tb'
 
-const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
-  const [formData, setFormData] = useState({
-    profileImage: '',
-    AadharCard: '',
-    DOB: ''
-  })
-  const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setSelectedFile(URL.createObjectURL(file))
-      setFormData({ ...formData, profileImage: file })
-    } else {
-      setSelectedFile('./DefaultUser.svg')
-    }
-  }
-
+const OwnerDetails = ({
+  handleSectionChange,
+  name,
+  email,
+  phoneNumber,
+  image,
+  formData,
+  setFormData
+}) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
@@ -34,10 +24,6 @@ const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
 
   const handleGymDetailsData = (e) => {
     e.preventDefault()
-
-    // Add the dispatching logic here
-
-    // Move to the next page
     NextPage()
   }
   return (
@@ -61,12 +47,10 @@ const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
                 className="FileUploader"
                 type="file"
                 accept=".jpg, .png,"
-                // onChange={handleFileChange}
                 name="profileImage"
                 disabled="true"
               />
               <img src={image} alt="Preview" className="Custom_ImageUploader_Preview" />
-              {/* <TbCameraUp className="UploadImageIcon" /> */}
             </div>
             <input
               className="Auth_Input"
@@ -89,7 +73,7 @@ const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
               type="date"
               name="DOB"
               placeholder="Date of Birth"
-              aria-placeholder='Date of Birth'
+              aria-placeholder="Date of Birth"
               value={formData.DOB}
               onChange={(e) => handleInputChange(e)}
             />
@@ -99,6 +83,22 @@ const OwnerDetails = ({ handleSectionChange,name,email,phoneNumber,image}) => {
               name="AadharCard"
               placeholder="Aadhar Card Number"
               value={formData.AadharCard}
+              onChange={(e) => handleInputChange(e)}
+            />
+            <input
+              className="Auth_Input"
+              type="text"
+              name="Address1"
+              placeholder="Address1"
+              value={formData.Address1}
+              onChange={(e) => handleInputChange(e)}
+            />
+            <input
+              className="Auth_Input"
+              type="text"
+              name="Address2"
+              placeholder="Address2"
+              value={formData.Address2}
               onChange={(e) => handleInputChange(e)}
             />
           </div>

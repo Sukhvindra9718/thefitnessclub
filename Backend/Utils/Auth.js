@@ -11,7 +11,7 @@ const pool = new Pool({
   port: 5432, // Default PostgreSQL port
 });
 exports.authorizationGymOwner = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.headers.authorization.split("Bearer ")[1];
+  const token = req?.headers?.authorization?.split("Bearer ")[1];
 
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
@@ -21,12 +21,12 @@ exports.authorizationGymOwner = CatchAsyncErrors(async (req, res, next) => {
 
   req.user = await getUserFromDatabase(
     "email",
-    decodedData.id.split(".com")[0] + ".com"
+    decodedData?.id?.split(".com")[0] + ".com"
   );
-  if (req.user.role !== "gymOwner") {
+  if (req?.user?.role !== "gymOwner") {
     return next(
       new ErrorHandler(
-        `Role: ${req.user.role} is not allowed to access this resource `,
+        `Role: ${req?.user?.role} is not allowed to access this resource `,
         403
       )
     );
@@ -34,7 +34,7 @@ exports.authorizationGymOwner = CatchAsyncErrors(async (req, res, next) => {
   return next();
 });
 exports.authorizationGymTrainee = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.headers.authorization.split("Bearer ")[1];
+  const token = req?.headers?.authorization?.split("Bearer ")[1];
 
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
@@ -44,12 +44,12 @@ exports.authorizationGymTrainee = CatchAsyncErrors(async (req, res, next) => {
 
   req.user = await getUserFromDatabase(
     "email",
-    decodedData.id.split(".com")[0] + ".com"
+    decodedData?.id?.split(".com")[0] + ".com"
   );
-  if (req.user.role !== "trainee") {
+  if (req?.user?.role !== "trainee") {
     return next(
       new ErrorHandler(
-        `Role: ${req.user.role} is not allowed to access this resource `,
+        `Role: ${req?.user?.role} is not allowed to access this resource `,
         403
       )
     );
@@ -57,7 +57,7 @@ exports.authorizationGymTrainee = CatchAsyncErrors(async (req, res, next) => {
   return next();
 });
 exports.authorizationGymTrainer = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.headers.authorization.split("Bearer ")[1];
+  const token = req?.headers?.authorization?.split("Bearer ")[1];
 
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
@@ -67,12 +67,12 @@ exports.authorizationGymTrainer = CatchAsyncErrors(async (req, res, next) => {
 
   req.user = await getUserFromDatabase(
     "email",
-    decodedData.id.split(".com")[0] + ".com"
+    decodedData?.id?.split(".com")[0] + ".com"
   );
-  if (req.user.role !== "trainer") {
+  if (req?.user?.role !== "trainer") {
     return next(
       new ErrorHandler(
-        `Role: ${req.user.role} is not allowed to access this resource `,
+        `Role: ${req?.user?.role} is not allowed to access this resource `,
         403
       )
     );
@@ -80,7 +80,7 @@ exports.authorizationGymTrainer = CatchAsyncErrors(async (req, res, next) => {
   return next();
 });
 exports.authorizationAdmin = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.headers.authorization.split("Bearer ")[1];
+  const token = req?.headers?.authorization?.split("Bearer ")[1];
 
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
@@ -90,12 +90,12 @@ exports.authorizationAdmin = CatchAsyncErrors(async (req, res, next) => {
 
   req.user = await getUserFromDatabase(
     "email",
-    decodedData.id.split(".com")[0] + ".com"
+    decodedData?.id?.split(".com")[0] + ".com"
   );
-  if (req.user.role !== "admin") {
+  if (req?.user?.role !== "admin") {
     return next(
       new ErrorHandler(
-        `Role: ${req.user.role} is not allowed to access this resource `,
+        `Role: ${req?.user?.role} is not allowed to access this resource `,
         403
       )
     );
@@ -105,8 +105,7 @@ exports.authorizationAdmin = CatchAsyncErrors(async (req, res, next) => {
 
 
 exports.Authentication = CatchAsyncErrors(async (req, res, next) => {
-  const token = req.headers.authorization.split("Bearer ")[1];
-  console.log("auth");
+  const token = req?.headers?.authorization?.split("Bearer ")[1];
   if (!token) {
     return next(new ErrorHandler("Login first to access this resource", 401));
   }
@@ -114,7 +113,7 @@ exports.Authentication = CatchAsyncErrors(async (req, res, next) => {
 
   req.user = await getUserFromDatabase(
     "email",
-    decodedData.id.split(".com")[0] + ".com"
+    decodedData?.id?.split(".com")[0] + ".com"
   );
   next();
 });
