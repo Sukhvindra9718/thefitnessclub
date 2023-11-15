@@ -26,7 +26,7 @@ import {
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const IP = '192.168.244.79'
+const IP = '192.168.0.107'
 // Admin Actions
 export const getAllMembers = () => async (dispatch) => {
   try {
