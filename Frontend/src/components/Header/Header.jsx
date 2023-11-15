@@ -6,11 +6,13 @@ import SignIn from '../../pages/Auth/SignIn'
 import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
 import Cookies from 'js-cookie'
+import MyAccount from '../../pages/MyAccount'
 
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
   const [verifyVisible, SetVerifyVisible] = useState(false)
+  const [profileVisible, setProfileVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -32,6 +34,12 @@ function Header() {
     SetSignUpVisible((signUpVisible) => !signUpVisible)
   }
 
+  const handleProfileVisibility = () => {
+    // Disable scrolling
+    document.body.style.overflow = 'hidden'
+    setProfileVisible((profileVisible) => !profileVisible)
+  }
+
   const handleLogout = () => {
     Cookies.remove('user')
     Cookies.remove('token')
@@ -44,7 +52,6 @@ function Header() {
     setUser(demo ? JSON.parse(demo) : null)
     setProfileImageSrc(imageUrl)
   }, [])
-
 
   return (
     <>
@@ -85,22 +92,19 @@ function Header() {
               alt="profile"
             />
             {profileOption && (
-              <div className="profile-option">
-                <div
-                  onClick={() =>
-                    navigate('/profile', {
-                      state: { profileImageSrc: profileImageSrc, user: user }
-                    })
-                  }>
-                  <h2>Profile</h2>
+              <>
+                <div className="profile-option">
+                  <div onClick={handleProfileVisibility}>
+                    <h2>Profile</h2>
+                  </div>
+                  <div onClick={() => navigate('/dashboard')}>
+                    <h2>Dashboard</h2>
+                  </div>
+                  <div onClick={handleLogout}>
+                    <h2>Logout</h2>
+                  </div>
                 </div>
-                <div onClick={() => navigate('/dashboard')}>
-                  <h2>Dashboard</h2>
-                </div>
-                <div onClick={handleLogout}>
-                  <h2>Logout</h2>
-                </div>
-              </div>
+              </>
             )}
           </div>
         )}
@@ -122,7 +126,22 @@ function Header() {
           setImage={setImage}
         />
       )}
-      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email} name={name} phoneNumber={phoneNumber} image={image}/>}
+      {verifyVisible && (
+        <Verify
+          SetVerifyVisible={SetVerifyVisible}
+          email={email}
+          name={name}
+          phoneNumber={phoneNumber}
+          image={image}
+        />
+      )}
+      {profileVisible && (
+        <MyAccount
+          setProfileVisible={setProfileVisible}
+          profileImageSrc={profileImageSrc}
+          user={user}
+        />
+      )}
     </>
   )
 }
