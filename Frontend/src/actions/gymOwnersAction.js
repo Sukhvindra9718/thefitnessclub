@@ -121,6 +121,7 @@ export const getLoginUser = (id) => async (dispatch) => {
 
     const { data } = await axios.get(`http://${IP}:3001/api/v1/getUserDetail/${id}`, config)
 
+    delete data.user.password
     localStorage.setItem('user', JSON.stringify(data.user));
 
     dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })

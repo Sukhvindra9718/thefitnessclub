@@ -187,7 +187,7 @@ exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
 exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
   console.log("GetUserDetail")
   req.user.profile_image = req.user.profile_image.toString("base64");
-
+  req.user.gymlogo = req.user.gymlogo.toString("base64");
   let user = req.user;
   res.status(200).json({
     success: true,

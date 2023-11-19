@@ -135,7 +135,6 @@ function Header() {
       {profileVisible && (
         <MyAccount
           setProfileVisible={setProfileVisible}
-          profileImageSrc={'data:image/jpeg;base64,' + user?.profile_image}
           user={user}
         />
       )}
