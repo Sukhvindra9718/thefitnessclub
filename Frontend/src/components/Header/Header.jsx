@@ -7,16 +7,19 @@ import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
 import Cookies from 'js-cookie'
 import Loader from '../Loader'
+import MyAccount from '../../pages/MyAccount'
+
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
   const [verifyVisible, SetVerifyVisible] = useState(false)
+  const [profileVisible, setProfileVisible] = useState(false)
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [profileOption, setProfileOption] = useState(false)
   const [userId, setUserId] = useState()
-  const [user, setUser] = useState();
+  const [user, setUser] = useState()
   const [image, setImage] = useState('')
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
@@ -33,6 +36,12 @@ function Header() {
     SetSignUpVisible((signUpVisible) => !signUpVisible)
   }
 
+  const handleProfileVisibility = () => {
+    // Disable scrolling
+    document.body.style.overflow = 'hidden'
+    setProfileVisible((profileVisible) => !profileVisible)
+  }
+
   const handleLogout = () => {
     Cookies.remove('user')
     Cookies.remove('token')
@@ -47,8 +56,9 @@ function Header() {
     setLoading(false)
   }, [])
 
-
-  return loading ? (<Loader loading={loading}/>):(
+  return loading ? (
+    <Loader loading={loading} />
+  ) : (
     <>
       <div className="Header">
         <div className="Header_Logo">
@@ -88,12 +98,7 @@ function Header() {
             />
             {profileOption && (
               <div className="profile-option">
-                <div
-                  onClick={() =>
-                    navigate('/profile', {
-                      state: {userId: userId }
-                    })
-                  }>
+                <div onClick={handleProfileVisibility}>
                   <h2>Profile</h2>
                 </div>
                 <div onClick={() => navigate('/dashboard')}>
@@ -107,12 +112,7 @@ function Header() {
           </div>
         )}
       </div>
-      {signInVisible && (
-        <SignIn
-          SetSignInVisible={SetSignInVisible}
-          setUserId={setUserId}
-        />
-      )}
+      {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} setUserId={setUserId} />}
       {signUpVisible && (
         <SignUp
           SetSignUpVisible={SetSignUpVisible}
@@ -123,7 +123,22 @@ function Header() {
           setImage={setImage}
         />
       )}
-      {verifyVisible && <Verify SetVerifyVisible={SetVerifyVisible} email={email} name={name} phoneNumber={phoneNumber} image={image}/>}
+      {verifyVisible && (
+        <Verify
+          SetVerifyVisible={SetVerifyVisible}
+          email={email}
+          name={name}
+          phoneNumber={phoneNumber}
+          image={image}
+        />
+      )}
+      {profileVisible && (
+        <MyAccount
+          setProfileVisible={setProfileVisible}
+          profileImageSrc={'data:image/jpeg;base64,' + user?.profile_image}
+          user={user}
+        />
+      )}
     </>
   )
 }
