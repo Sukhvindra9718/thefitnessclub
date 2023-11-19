@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AiFillEye, AiFillEdit, AiOutlinePlus } from 'react-icons/ai'
 import { MdDelete } from 'react-icons/md'
 import Pagination from '../components/Pagination.jsx'
@@ -8,8 +8,6 @@ import { GrSort } from 'react-icons/gr'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Loader from '../../../components/Loader.jsx'
-
-
 
 const list = [
   'Membership Active',
@@ -36,24 +34,29 @@ function TrainerOverview() {
   const [selected, setSelected] = React.useState('')
   const [selectedSortValue, setSelectedSortValue] = React.useState('')
   const [selectedDate, setSelectedDate] = React.useState('')
-  const [data,setData] = React.useState([])
-  const [trainers,setTrainers] = React.useState([])
+  const [data, setData] = React.useState([])
+  const [trainers, setTrainers] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
+
   const totalPages = 5 // Replace with the actual total number of pages.
-  const [loading, setLoading] = React.useState(true);
+  const navigate = useNavigate()
 
   const getAllTrainers = () => {
-    const token = Cookies.get('token');
-    const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
-
-    axios.get(`http://192.168.244.79:3001/api/v1/trainer/getAllTrainers`, config).then((response) => {
-      setData(response.data.trainers);
-      setTrainers(response.data.trainers)
-      setLoading(false);
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     }
-    ).catch((err) => {
-      console.log(err);
-    })
 
+    axios
+      .get(`http://192.168.1.12:3001/api/v1/trainer/getAllTrainers`, config)
+      .then((response) => {
+        setData(response.data.trainers)
+        setTrainers(response.data.trainers)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
   const handlePageChange = (page) => {
     setCurrentPage(page)
@@ -61,79 +64,85 @@ function TrainerOverview() {
   }
 
   const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
-    const filter = [...trainers].filter((item)=>item.joiningdate.split("T")[0]===e.target.value)
+    setSelectedDate(e.target.value)
+    const filter = [...trainers].filter((item) => item.joiningdate.split('T')[0] === e.target.value)
     setData(filter)
   }
   const handleOptionClick = (label) => {
     setSelected(label)
     setShowFilter(!showfilter)
-    switch(label){
-      case "Membership Active":
-        setData([...trainers].filter((item)=>item.status==="active"))
-        break;
-      case "Membership Pending":
-        setData([...trainers].filter((item)=>item.status==="pending"))
-        break;
-      case "Attendance Inactive":
-        setData([...trainers].filter((item)=>item.status==="inactive"))
-        break;
-      case "Attendance Active":
-        setData([...trainers].filter((item)=>item.status==="active"))
-        break;
-      case "Current Month Payments":
-        setData([...trainers].filter((item)=>item.status==="active"))
-        break;
-      case "Clear Filter":
+    switch (label) {
+      case 'Membership Active':
+        setData([...trainers].filter((item) => item.status === 'active'))
+        break
+      case 'Membership Pending':
+        setData([...trainers].filter((item) => item.status === 'pending'))
+        break
+      case 'Attendance Inactive':
+        setData([...trainers].filter((item) => item.status === 'inactive'))
+        break
+      case 'Attendance Active':
+        setData([...trainers].filter((item) => item.status === 'active'))
+        break
+      case 'Current Month Payments':
+        setData([...trainers].filter((item) => item.status === 'active'))
+        break
+      case 'Clear Filter':
         setData([...trainers])
-        break;
+        break
       default:
-        break;
-
+        break
     }
   }
   const handleSortOptionClick = (label) => {
     setSelectedSortValue(label)
-    setShowSort(!showSort);
-    switch(label){
-      case "Newest Transaction":
-        setData([...trainers].sort((a,b)=>new Date(b.createdat)-new Date(a.createdat)))
-        break;
-      case "Oldest Transaction":
-        setData([...trainers].sort((a,b)=>new Date(a.createdat)-new Date(b.createdat)))
-        break;
-      case "Nearest Due Date":
-        setData([...trainers].sort((a,b)=>new Date(b.createdat)-new Date(a.createdat)))
-        break;
-      case "Farthest Due Date":
-        setData([...trainers].sort((a,b)=>new Date(a.createdat)-new Date(b.createdat)))
-        break;
-      case "Member ID (Low to High)":
-        setData([...trainers].sort((a,b)=>a.id-b.id))
-        break;
-      case "Member ID (High to Low)":
-        setData([...trainers].sort((a,b)=>b.id-a.id))
-        break;
+    setShowSort(!showSort)
+    switch (label) {
+      case 'Newest Transaction':
+        setData([...trainers].sort((a, b) => new Date(b.createdat) - new Date(a.createdat)))
+        break
+      case 'Oldest Transaction':
+        setData([...trainers].sort((a, b) => new Date(a.createdat) - new Date(b.createdat)))
+        break
+      case 'Nearest Due Date':
+        setData([...trainers].sort((a, b) => new Date(b.createdat) - new Date(a.createdat)))
+        break
+      case 'Farthest Due Date':
+        setData([...trainers].sort((a, b) => new Date(a.createdat) - new Date(b.createdat)))
+        break
+      case 'Member ID (Low to High)':
+        setData([...trainers].sort((a, b) => a.id - b.id))
+        break
+      case 'Member ID (High to Low)':
+        setData([...trainers].sort((a, b) => b.id - a.id))
+        break
       default:
-        break;
+        break
     }
   }
-  const handleSearch = ()=>{
-    const filterData = trainers.filter((item)=>item.firstname.toLowerCase().includes(search.toLowerCase()))
+  const handleSearch = () => {
+    const filterData = trainers.filter((item) =>
+      item.firstname.toLowerCase().includes(search.toLowerCase())
+    )
     setData(filterData)
   }
 
   React.useEffect(() => {
-    getAllTrainers();
+    return () => {
+      getAllTrainers()
+    }
   }, [])
-  return loading?(<Loader loading={loading}/>):(
+
+  return loading ? (
+    <Loader loading={loading} />
+  ) : (
     <div className="membership">
       <div className="filter-membership">
         <div className="filter-membership-container">
           <div className="header-table">
             <h1>All Trainers</h1>
-            <div className='add-btn'>
-              <AiOutlinePlus size={25} style={{cursor:"pointer"}}/>
+            <div className="add-btn" onClick={() => navigate('/addtrainer')}>
+              <AiOutlinePlus size={25} style={{ cursor: 'pointer' }} />
               <h1>Add Trainer</h1>
             </div>
           </div>
@@ -175,11 +184,7 @@ function TrainerOverview() {
               </div>
               <div className="date-container">
                 <h4>Select Joining Date</h4>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                />
+                <input type="date" value={selectedDate} onChange={handleDateChange} />
               </div>
               <div className="filter-container">
                 <GrSort
@@ -233,64 +238,65 @@ function TrainerOverview() {
           </div>
         </div>
         <div className="table-body">
-          {data?.length > 0 && data.map((item, index) => (
-            <div className="table-row" key={index}>
-              <div className="item2 item">
-                <h1>{item.id}</h1>
-              </div>
-              <div className="item1 item">
-                <div>
-                  <img
-                    src="https://www.w3schools.com/howto/img_avatar.png"
-                    alt="Avatar"
-                    className="avatar"
-                  />
+          {data?.length > 0 &&
+            data.map((item, index) => (
+              <div className="table-row" key={index}>
+                <div className="item2 item">
+                  <h1>{item.id}</h1>
                 </div>
-                <div>
-                  <h1>{item.firstname + ' '+ item.lastname}</h1>
-                  <p>{item.phonenumber}</p>
+                <div className="item1 item">
+                  <div>
+                    <img
+                      src={`data:image/jpeg;base64,${item.profile_image}`}
+                      alt="Avatar"
+                      className="avatar"
+                    />
+                  </div>
+                  <div>
+                    <h1>{item.firstname + ' ' + item.lastname}</h1>
+                    <p>{item.phonenumber}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="item4 item">
-                <div className="plan">
-                  <p>{item.address}</p>
+                <div className="item4 item">
+                  <div className="plan">
+                    <p>{item.address}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="item3 item">
-                <div className="date">
-                  <div
-                    style={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around',
-                      alignItems: 'center'
-                    }}>
-                    <h3>{item.joiningdate.split('T')[0]}</h3>
+                <div className="item3 item">
+                  <div className="date">
+                    <div
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-around',
+                        alignItems: 'center'
+                      }}>
+                      <h3>{new Date(item.joiningdate).toLocaleString().split(',')[0]}</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="item5 item">
+                  <div className="status-badge">
+                    <div className="circle"></div>
+                    <h1>{item.status}</h1>
+                  </div>
+                </div>
+                <div className="item6 item">
+                  <div className="actions">
+                    <Link to="/dashboard/membership/view">
+                      <AiFillEye size={25} />
+                    </Link>
+                    <Link to="/dashboard/membership/edit">
+                      <AiFillEdit size={25} />
+                    </Link>
+                    <Link to="/dashboard/membership/delete">
+                      <MdDelete size={25} />
+                    </Link>
                   </div>
                 </div>
               </div>
-              <div className="item5 item">
-                <div className="status-badge">
-                  <div className="circle"></div>
-                  <h1>{item.status}</h1>
-                </div>
-              </div>
-              <div className="item6 item">
-                <div className="actions">
-                  <Link to="/dashboard/membership/view">
-                    <AiFillEye size={25} />
-                  </Link>
-                  <Link to="/dashboard/membership/edit">
-                    <AiFillEdit size={25} />
-                  </Link>
-                  <Link to="/dashboard/membership/delete">
-                    <MdDelete size={25} />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
       <div className="pagination-container">

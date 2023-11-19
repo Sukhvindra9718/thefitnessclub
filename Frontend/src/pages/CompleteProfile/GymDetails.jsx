@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { TbCameraUp } from 'react-icons/tb'
 
 const GymDetails = ({ handleSectionChange, formData, setFormData,selectedFile,setSelectedFile }) => {

@@ -32,7 +32,7 @@ const PaymentDetails = ({ handleSectionChange, formData,token }) => {
       headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
     }
     axios
-      .put('http://192.168.244.79:3001/api/v1/complete/profile', newForm, config)
+      .put('http://192.168.1.12:3001/api/v1/complete/profile', newForm, config)
       .then((res) => {
         if(res.data.success){
           navigate('/dashboard')

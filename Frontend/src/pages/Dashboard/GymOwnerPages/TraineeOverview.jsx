@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link,useNavigate } from 'react-router-dom'
 import { AiFillEye, AiFillEdit,AiOutlinePlus} from 'react-icons/ai'
 import { MdDelete } from 'react-icons/md'
 import Pagination from '../components/Pagination.jsx'
@@ -27,13 +27,13 @@ function TraineeOverview() {
   const [trainees,setTrainees] = React.useState([])
   const [loading,setLoading] = React.useState(true)
   const totalPages = 5
-
+  const navigate = useNavigate()
   
   const getAllTrainees = () => {
     const token = Cookies.get('token');
     const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
 
-    axios.get(`http://192.168.244.79:3001/api/v1/trainee/getAllTrainee`, config).then((response) => {
+    axios.get(`http://192.168.1.12:3001/api/v1/trainee/getAllTrainee`, config).then((response) => {
       setData(response.data.trainees);
       setTrainees(response.data.trainees);
       setLoading(false);
@@ -109,8 +109,10 @@ function TraineeOverview() {
     setData(filterData)
   }
   React.useEffect(() => {
-    getAllTrainees();
-  }, [])
+    return () => { 
+      getAllTrainees();
+     }
+  }, [])  
 
 
   return loading?(<Loader loading={loading}/>):(
@@ -119,7 +121,7 @@ function TraineeOverview() {
         <div className="filter-membership-container">
           <div className="header-table">
             <h1>All Trainers</h1>
-            <div className='add-btn'>
+            <div className='add-btn' onClick={()=> navigate('/addtrainee')}>
               <AiOutlinePlus size={25} style={{cursor:"pointer"}}/>
               <h1>Add Trainee</h1>
             </div>

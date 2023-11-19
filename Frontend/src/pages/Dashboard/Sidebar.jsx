@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, {useEffect } from 'react'
 import { BiHelpCircle, BiSolidDashboard, BiSolidOffer } from 'react-icons/bi'
 import { IoSendSharp } from 'react-icons/io5'
 import { MdManageAccounts, MdCardMembership, MdOutlineHomeRepairService } from 'react-icons/md'
 import { GoReport } from 'react-icons/go'
 import {FaChalkboardTeacher} from "react-icons/fa"
 import {PiStudentBold} from "react-icons/pi"
-import Cookies from 'js-cookie'
+import Loader from '../../components/Loader'
+
 
 function Sidebar({ active, setActive }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = React.useState()
+  const [loading, setLoading] = React.useState(true)
   useEffect(() => {
-    const demo = Cookies.get('user')
-    setUser(demo ? JSON.parse(demo) : null)
+    const data = JSON.parse(localStorage.getItem('user'))
+    setUser(data)
+    setLoading(false)
   }, [])
-  return (
+  return loading?(<Loader loading={loading}/>):( 
     <div>
       <div className="sidebar-logo">
         <img className="sidebar-img" src="./Logo.png" alt="Logo" />
@@ -66,9 +69,9 @@ function Sidebar({ active, setActive }) {
         </div>}
 
         {user?.role === 'gymOwner' && <div
-          className={active === 7 ? 'sidebar-menu-item selected' : 'sidebar-menu-item'}
+          className={active === 0 ? 'sidebar-menu-item selected' : 'sidebar-menu-item'}
           onClick={() => setActive(7)}>
-          <BiSolidDashboard fill={active === 7 ? '#fff' : '#717171'} size={30} />
+          <BiSolidDashboard fill={active === 0 ? '#fff' : '#717171'} size={30} />
           <h4>Dashboard</h4>
         </div>}
         {user?.role === 'gymOwner' && <div

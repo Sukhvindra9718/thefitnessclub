@@ -404,6 +404,7 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllTrainees = CatchAsyncErrors(async (req, res, next) => {
+  console.log("Get all trainees")
   let trainees = [];
   try {
     const client = await pool.connect();

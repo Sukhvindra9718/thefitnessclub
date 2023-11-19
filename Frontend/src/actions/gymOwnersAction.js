@@ -26,13 +26,16 @@ import {
 import axios from 'axios'
 import Cookies from 'js-cookie'
 
-const IP = '192.168.244.79'
+const IP = '192.168.1.12'
 // Admin Actions
 export const getAllMembers = () => async (dispatch) => {
   try {
     dispatch({ type: GET_ALL_USER_REQUEST })
 
-    const config = { headers: { 'Content-Type': 'application/json' } }
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    }
 
     const { data } = await axios.get(`http://${IP}:3001/api/v1/getAllUsers`, config)
 
@@ -58,13 +61,13 @@ export const login =
       if (response.ok) {
         const data = await response.json()
 
-        Cookies.set('token', data.token, { expires: 7 })
         const demo = data.user
         delete demo.profile_image
         delete demo.password
-        const user = JSON.stringify(demo)
 
-        Cookies.set('user', user, { expires: 7 })
+        Cookies.set('user', demo.id+'', { expires: 7 })
+
+        Cookies.set('token', data.token, { expires: 7 })
         dispatch({ type: LOGIN_SUCCESS, payload: data ? data : {} })
       } else {
         console.error('Login failed')
@@ -108,7 +111,7 @@ export const verify = (email, otp) => async (dispatch) => {
   }
 }
 
-export const getLoginUser = () => async (dispatch) => {
+export const getLoginUser = (id) => async (dispatch) => {
   try {
     dispatch({ type: GET_LOGIN_USER_REQUEST })
     const token = Cookies.get('token')
@@ -116,7 +119,9 @@ export const getLoginUser = () => async (dispatch) => {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
     }
 
-    const { data } = await axios.get(`http://${IP}:3001/api/v1/getUserDetail/:id`, config)
+    const { data } = await axios.get(`http://${IP}:3001/api/v1/getUserDetail/${id}`, config)
+
+    localStorage.setItem('user', JSON.stringify(data.user));
 
     dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })
   } catch (error) {

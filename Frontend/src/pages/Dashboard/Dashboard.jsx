@@ -1,12 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Sidebar from './Sidebar'
 import Main from './Main'
 import '../../Style/Dashboard.css'
+import {useLocation} from 'react-router-dom'
 
 
 
 function Dashboard() {
   const [active,setActive]=React.useState(0)
+  const {state} = useLocation();
+
+  useEffect(() => {
+    if(state?.route){
+      console.log(state)
+      setActive(state.route)
+    }
+  }, [])
+
   return (
     <div className="dashboard">
       <div className='sidebar'>

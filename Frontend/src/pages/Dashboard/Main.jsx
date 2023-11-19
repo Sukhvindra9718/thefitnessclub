@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect} from 'react'
 import DashboardOverview from './AdminPages/DashboardOverview'
 import EnquiryOverview from './AdminPages/EnquiryOverview'
 import MembershipOverview from './AdminPages/MembershipOverview'
@@ -11,20 +11,36 @@ import TrainerOverviewGym from "../Dashboard/GymOwnerPages/TrainerOverview"
 import TraineeOverviewGym from "../Dashboard/GymOwnerPages/TraineeOverview"
 import { useSelector, useDispatch } from 'react-redux'
 import { getAllMembers} from '../../actions/gymOwnersAction'
-import Cookies from 'js-cookie'
+import Loader from '../../components/Loader.jsx'
+import { useNavigate } from 'react-router-dom'
 
 function Main({ active }) {
-  const [user,setUser] = useState(null)
+  const [loading, setLoading] = React.useState(true)
+  const [user, setUser] = React.useState()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const { gymOwners } = useSelector((state) => state.gymOwners)
 
-  useEffect(() => {
-    dispatch(getAllMembers());
-    const demo = Cookies.get('user');
-    setUser(demo? JSON.parse(demo):null)
-  }, [dispatch])
 
-  return (
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem('user'))
+    setUser(data)
+    if(data){
+      setLoading(false);
+    }else{
+      navigate('/')
+    }
+  }, [])
+
+  useEffect(() => {
+    if(user?.role === 'admin'){
+      return ()=>{
+        dispatch(getAllMembers());
+      }
+    }
+  }, [])
+
+  return loading?(<Loader loading={loading}/>):(
     <div style={{ height: '100%' }}>
       {active === 0 && user?.role === 'admin' && <DashboardOverview />}
       {active === 1 && user?.role === 'admin' && <EnquiryOverview />}
@@ -33,9 +49,9 @@ function Main({ active }) {
       {active === 4 && user?.role === 'admin' && <StaffManagementOverview />}
       {active === 5 && user?.role === 'admin' && <ReportsOverview />}
       {active === 6 && user?.role === 'admin' && <OffersPackagesOverview />}
-      {active === 7 && user?.role === 'gymOwner' && <DashboardOverviewGym />}
-      {active === 8 && user?.role === 'gymOwner' && <TrainerOverviewGym trainers={gymOwners}/>}
-      {active === 9 && user?.role === 'gymOwner' && <TraineeOverviewGym trainees={gymOwners}/>}
+      {active === 0 && user?.role === 'gymOwner' && <DashboardOverviewGym />}
+      {active === 8 && user?.role === 'gymOwner' && <TrainerOverviewGym/>}
+      {active === 9 && user?.role === 'gymOwner' && <TraineeOverviewGym/>}
     </div>
   )
 }

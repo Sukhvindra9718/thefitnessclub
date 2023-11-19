@@ -6,7 +6,7 @@ import SignIn from '../../pages/Auth/SignIn'
 import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
 import Cookies from 'js-cookie'
-
+import Loader from '../Loader'
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
   const [signUpVisible, SetSignUpVisible] = useState(false)
@@ -14,10 +14,11 @@ function Header() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
-  const [profileImageSrc, setProfileImageSrc] = useState('')
   const [profileOption, setProfileOption] = useState(false)
-  const [user, setUser] = useState()
+  const [userId, setUserId] = useState()
+  const [user, setUser] = useState();
   const [image, setImage] = useState('')
+  const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
   const handleSignInVisibility = () => {
@@ -39,14 +40,15 @@ function Header() {
   }
 
   useEffect(() => {
-    const demo = Cookies.get('user')
-    const imageUrl = Cookies.get('image')
-    setUser(demo ? JSON.parse(demo) : null)
-    setProfileImageSrc(imageUrl)
+    const id = Cookies.get('user')
+    setUserId(id)
+    const data = JSON.parse(localStorage.getItem('user'))
+    setUser(data)
+    setLoading(false)
   }, [])
 
 
-  return (
+  return loading ? (<Loader loading={loading}/>):(
     <>
       <div className="Header">
         <div className="Header_Logo">
@@ -63,7 +65,7 @@ function Header() {
           <Link className="Link">Pages</Link>
           <Link className="Link">Contact</Link>
         </div>
-        {!user ? (
+        {!userId ? (
           <div className="Header_Auth">
             <button
               onClick={() => handleSignInVisibility()}
@@ -81,7 +83,7 @@ function Header() {
             <img
               className="profile-image"
               onClick={() => setProfileOption(!profileOption)}
-              src={Cookies.get('image')}
+              src={`data:image/jpeg;base64,${user?.profile_image}`}
               alt="profile"
             />
             {profileOption && (
@@ -89,7 +91,7 @@ function Header() {
                 <div
                   onClick={() =>
                     navigate('/profile', {
-                      state: { profileImageSrc: profileImageSrc, user: user }
+                      state: {userId: userId }
                     })
                   }>
                   <h2>Profile</h2>
@@ -108,8 +110,7 @@ function Header() {
       {signInVisible && (
         <SignIn
           SetSignInVisible={SetSignInVisible}
-          setProfileImageSrc={setProfileImageSrc}
-          setUser={setUser}
+          setUserId={setUserId}
         />
       )}
       {signUpVisible && (

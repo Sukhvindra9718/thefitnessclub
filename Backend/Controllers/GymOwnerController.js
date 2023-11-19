@@ -128,7 +128,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email", email);
-  console.log(user);
+  console.log("loginUser");
   //Checks if password is correct or not
   if (user.isverified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
@@ -185,6 +185,9 @@ exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
+  console.log("GetUserDetail")
+  req.user.profile_image = req.user.profile_image.toString("base64");
+
   let user = req.user;
   res.status(200).json({
     success: true,
@@ -365,6 +368,7 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
+  console.log("UpdateProfile")
   const { name, email, phoneNumber, address, role } = req.body;
   const profileImage =
     req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
@@ -395,6 +399,7 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
   });
 });
 exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
+  console.log("CompleteProfile")
   const {
     AadharCard,
     DOB,
@@ -439,6 +444,7 @@ exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
+  console.log("GetAllUsers")
   let gymOwners = [];
   try {
     const client = await pool.connect();
@@ -507,7 +513,7 @@ const getUserFromDatabase = async (findById, value) => {
     if (result.rows.length !== 0) {
       user = result.rows[0];
     }
-    console.log(user);
+
   } catch (error) {
     return new ErrorHandler(error.message, 400);
   }

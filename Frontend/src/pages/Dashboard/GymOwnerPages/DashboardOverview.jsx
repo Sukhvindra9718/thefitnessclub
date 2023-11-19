@@ -2,7 +2,7 @@ import React from 'react'
 
 function DashboardOverview() {
   return (
-    <div>DashboardOverview</div>
+    <div style={{color:"black"}}>DashboardOverview</div>
   )
 }
 

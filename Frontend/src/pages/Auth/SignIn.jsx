@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 
 
 
-const SignIn = ({ SetSignInVisible, setProfileImageSrc,setUser}) => {
+const SignIn = ({ SetSignInVisible,setUserId}) => {
   const dispatch = useDispatch()
   const data = useSelector((state) => state.auth)
 
@@ -33,32 +33,31 @@ const SignIn = ({ SetSignInVisible, setProfileImageSrc,setUser}) => {
     if (data.token) {
       // eslint-disable-next-line
       handleSignInVisibility();
-      const demo = Cookies.get('user')
-      const user = demo ? JSON.parse(demo) : null
-      setUser(user);
-      fetchProfileImage(user?.id)
-      // eslint-disable-next-line
+      const id = Cookies.get('user')
+      setUserId(id);
+      // fetchProfileImage(user?.id)
     }
+    // eslint-disable-next-line
   }, [data.token])
 
 
-  const fetchProfileImage = async (userId) => {
-    try {
-      const response = await fetch(
-        `http://192.168.244.79:3001/api/v1/user/${userId}/profile-image`
-      )
-      if (response.ok) {
-        const blob = await response.blob()
-        const imageUrl = URL.createObjectURL(blob)
-        Cookies.set('image',imageUrl)
-        setProfileImageSrc(imageUrl)
-      } else {
-        console.error('Failed to fetch profile image.')
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
+  // const fetchProfileImage = async (userId) => {
+  //   try {
+  //     const response = await fetch(
+  //       `http://192.168.1.12:3001/api/v1/user/${userId}/profile-image`
+  //     )
+  //     if (response.ok) {
+  //       const blob = await response.blob()
+  //       const imageUrl = URL.createObjectURL(blob)
+  //       Cookies.set('image',imageUrl)
+  //       setProfileImageSrc(imageUrl)
+  //     } else {
+  //       console.error('Failed to fetch profile image.')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error)
+  //   }
+  // }
 
   return (
     <div className="Auth_Modal">
