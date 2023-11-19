@@ -1,0 +1,16 @@
+.MyAccount_Container {
+    width: 50vw;
+    height: fit-content;
+    max-height: 90vh;
+}
+
+.MyAccount_InputContainer {
+    margin-top: 2vw;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    grid-column-gap: 2vw;
+    grid-row-gap: 1vw;
+    
+}

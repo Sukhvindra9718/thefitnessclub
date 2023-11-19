@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { login} from '../../actions/gymOwnersAction'
+import { login } from '../../actions/gymOwnersAction'
 import { useDispatch, useSelector } from 'react-redux'
 import Cookies from 'js-cookie'
 
@@ -35,29 +35,9 @@ const SignIn = ({ SetSignInVisible,setUserId}) => {
       handleSignInVisibility();
       const id = Cookies.get('user')
       setUserId(id);
-      // fetchProfileImage(user?.id)
     }
     // eslint-disable-next-line
   }, [data.token])
-
-
-  // const fetchProfileImage = async (userId) => {
-  //   try {
-  //     const response = await fetch(
-  //       `http://192.168.1.12:3001/api/v1/user/${userId}/profile-image`
-  //     )
-  //     if (response.ok) {
-  //       const blob = await response.blob()
-  //       const imageUrl = URL.createObjectURL(blob)
-  //       Cookies.set('image',imageUrl)
-  //       setProfileImageSrc(imageUrl)
-  //     } else {
-  //       console.error('Failed to fetch profile image.')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error)
-  //   }
-  // }
 
   return (
     <div className="Auth_Modal">
