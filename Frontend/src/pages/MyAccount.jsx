@@ -20,7 +20,7 @@ const MyAccount = ({ setProfileVisible, profileImageSrc, user }) => {
       setSelectedFile('./DefaultUser.svg')
     }
   }
-
+  
   return (
     <div className="Auth_Modal">
       <div className="Auth_Container MyAccount_Container">

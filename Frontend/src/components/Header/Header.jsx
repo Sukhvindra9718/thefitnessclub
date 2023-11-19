@@ -98,25 +98,14 @@ function Header() {
             />
             {profileOption && (
               <div className="profile-option">
-                <div
-                  onClick={() =>
-                    navigate('/profile', {
-                      state: { userId: userId }
-                    })
-                  }>
+                <div onClick={handleProfileVisibility}>
                   <h2>Profile</h2>
-
-                  <div className="profile-option">
-                    <div onClick={handleProfileVisibility}>
-                      <h2>Profile</h2>
-                    </div>
-                    <div onClick={() => navigate('/dashboard')}>
-                      <h2>Dashboard</h2>
-                    </div>
-                    <div onClick={handleLogout}>
-                      <h2>Logout</h2>
-                    </div>
-                  </div>
+                </div>
+                <div onClick={() => navigate('/dashboard')}>
+                  <h2>Dashboard</h2>
+                </div>
+                <div onClick={handleLogout}>
+                  <h2>Logout</h2>
                 </div>
               </div>
             )}
@@ -146,7 +135,7 @@ function Header() {
       {profileVisible && (
         <MyAccount
           setProfileVisible={setProfileVisible}
-          profileImageSrc={profileImageSrc}
+          profileImageSrc={'data:image/jpeg;base64,' + user?.profile_image}
           user={user}
         />
       )}

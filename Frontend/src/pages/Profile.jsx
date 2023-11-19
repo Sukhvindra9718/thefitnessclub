@@ -1,13 +1,8 @@
 import React from 'react'
-import {useLocation,useNavigate} from 'react-router-dom'
 
 
-function Profile() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const user = location.state.user
-  const profileImage = location.state.profileImageSrc
-  console.log(user, profileImage)
+function Profile({profileImageSrc, user,setProfileVisible}) {
+  console.log(user, profileImageSrc)
 
   const selectedFields = [
     'id',
@@ -45,9 +40,9 @@ function Profile() {
             </tr>
           </tbody>
         </table>
-        {profileImage && (
+        {profileImageSrc && (
           <div className="profile-image">
-            <img src={profileImage} alt="Profile" />
+            <img src={profileImageSrc} alt="Profile" />
           </div>
         )}
       </div>
