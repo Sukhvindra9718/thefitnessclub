@@ -17,7 +17,7 @@ router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').post(resetPassword);
 router.route('/password/update').put(Authentication,authorizationGymTrainer,updatePassword);
 router.route('/update/profile').put(Authentication,uploadImage,updateProfile);
-router.route('/deleteTrainer/:id').delete(Authentication,authorizationGymTrainer,deleteTrainer);
+router.route('/deleteTrainer/:id').delete(Authentication,authorizationGymOwner,deleteTrainer);
 router.route('/membership').post(Authentication,authorizationGymTrainer,takeMembership);
 
 

@@ -215,3 +215,23 @@
 .logo-img-container{
     position: relative;
 }
+
+.Auth_ButtonContainer{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 1vw;
+}
+
+.Auth_Button{
+    border: none;
+    outline: none;
+    font-size: 1vw;
+    background-color: var(--primary-color);
+    padding: 0.5vw 1vw;
+    border-radius: 0.5vw;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+}

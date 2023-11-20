@@ -188,8 +188,8 @@ const MyAccount = ({ setProfileVisible, user }) => {
           <input
             className="Auth_Input"
             type="text"
-            name="status"
-            placeholder="Status"
+            name="gymregnum"
+            placeholder="Gym Registration Number"
             value={user.gymregnum}
             readOnly={true}
           />

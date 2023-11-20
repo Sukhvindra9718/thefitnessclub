@@ -541,7 +541,7 @@ const updateUserInDatabase = async (user) => {
       user.resetpasswordtokenexpire,
     ]);
   } catch (error) {
-    return new ErrorHandler(error.message, 400);
+    return error;
   }
 };
 
