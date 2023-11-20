@@ -11,9 +11,9 @@ function Dashboard() {
   const {state} = useLocation();
 
   useEffect(() => {
-    if(state?.route){
-      console.log(state)
-      setActive(state.route)
+    if(state?.trainer){
+      setActive(state.trainer)
+      delete state.trainer
     }
   }, [])
 

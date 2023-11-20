@@ -8,6 +8,8 @@ import { GrSort } from 'react-icons/gr'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Loader from '../../../components/Loader.jsx'
+import PreviewTrainer from '../AddTrainer/PreviewTrainer.jsx'
+import UpdateTrainer from '../AddTrainer/UpdateTrainer.jsx'
 
 const list = [
   'Membership Active',
@@ -37,7 +39,8 @@ function TrainerOverview() {
   const [data, setData] = React.useState([])
   const [trainers, setTrainers] = React.useState([])
   const [loading, setLoading] = React.useState(true)
-
+  const [previewVisible, setPreviewVisible] = React.useState(false)
+  const [updateVisible, setUpdateVisible] = React.useState(false)
   const totalPages = 5 // Replace with the actual total number of pages.
   const navigate = useNavigate()
 
@@ -126,7 +129,21 @@ function TrainerOverview() {
     )
     setData(filterData)
   }
-
+  const handleDelete = (id) => {
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    }
+    axios
+      .delete(`http://192.168.1.12:3001/api/v1/trainer/deleteTrainer/${id}`, config)
+      .then((response) => {
+        console.log(response)
+        window.location.reload()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
   React.useEffect(() => {
     return () => {
       getAllTrainers()
@@ -240,61 +257,67 @@ function TrainerOverview() {
         <div className="table-body">
           {data?.length > 0 &&
             data.map((item, index) => (
-              <div className="table-row" key={index}>
-                <div className="item2 item">
-                  <h1>{item.id}</h1>
-                </div>
-                <div className="item1 item">
-                  <div>
-                    <img
-                      src={`data:image/jpeg;base64,${item.profile_image}`}
-                      alt="Avatar"
-                      className="avatar"
-                    />
+              <div key={index}>
+                <div className="table-row">
+                  <div className="item2 item">
+                    <h1>{item.id}</h1>
                   </div>
-                  <div>
-                    <h1>{item.firstname + ' ' + item.lastname}</h1>
-                    <p>{item.phonenumber}</p>
+                  <div className="item1 item">
+                    <div style={{width:"20%"}}>
+                      <img
+                        src={`data:image/jpeg;base64,${item.profile_image}`}
+                        alt="Avatar"
+                        className="avatar"
+                      />
+                    </div>
+                    <div style={{width:"80%"}}>
+                      <h1>{item.firstname + ' ' + item.lastname}</h1>
+                      <p>{item.phonenumber}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="item4 item">
-                  <div className="plan">
-                    <p>{item.address}</p>
+                  <div className="item4 item">
+                    <div className="plan">
+                      <p>{item.address}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="item3 item">
-                  <div className="date">
-                    <div
-                      style={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-around',
-                        alignItems: 'center'
-                      }}>
-                      <h3>{new Date(item.joiningdate).toLocaleString().split(',')[0]}</h3>
+                  <div className="item3 item">
+                    <div className="date">
+                      <div
+                        style={{
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-around',
+                          alignItems: 'center'
+                        }}>
+                        <h3>{new Date(item.joiningdate).toLocaleString().split(',')[0]}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="item5 item">
+                    <div className="status-badge">
+                      <div className="circle"></div>
+                      <h1>{item.status}</h1>
+                    </div>
+                  </div>
+                  <div className="item6 item">
+                    <div className="actions">
+                      <Link onClick={() => setPreviewVisible(!previewVisible)}>
+                        <AiFillEye size={25} />
+                      </Link>
+                      <Link onClick={() => setUpdateVisible(!updateVisible)}>
+                        <AiFillEdit size={25} />
+                      </Link>
+                      <Link onClick={()=>handleDelete(item.id)}>
+                        <MdDelete size={25} />
+                      </Link>
                     </div>
                   </div>
                 </div>
-                <div className="item5 item">
-                  <div className="status-badge">
-                    <div className="circle"></div>
-                    <h1>{item.status}</h1>
-                  </div>
-                </div>
-                <div className="item6 item">
-                  <div className="actions">
-                    <Link to="/dashboard/membership/view">
-                      <AiFillEye size={25} />
-                    </Link>
-                    <Link to="/dashboard/membership/edit">
-                      <AiFillEdit size={25} />
-                    </Link>
-                    <Link to="/dashboard/membership/delete">
-                      <MdDelete size={25} />
-                    </Link>
-                  </div>
-                </div>
+                {previewVisible && (
+                  <PreviewTrainer setPreviewVisible={setPreviewVisible} user={item} />
+                )}
+                {updateVisible && <UpdateTrainer setUpdateVisible={setUpdateVisible} user={item} />}
               </div>
             ))}
         </div>

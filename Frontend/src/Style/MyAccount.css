@@ -2,6 +2,7 @@
     width: 50vw;
     height: fit-content;
     max-height: 90vh;
+    overflow-y: scroll;
 }
 
 .MyAccount_InputContainer {
@@ -14,3 +15,9 @@
     grid-row-gap: 1vw;
     
 }
+
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}  

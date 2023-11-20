@@ -60,7 +60,7 @@ function AddTrainer() {
   }
   const handleVerify = (e) => {
     e.preventDefault()
-    navigate('/dashboard', { route: 'trainer' })
+    navigate('/dashboard', { state: { trainer: 8 } })
   }
 
   const handleSubmit = (e) => {
@@ -104,7 +104,7 @@ function AddTrainer() {
   }
 
   
-  return loading ? (<Loader loading={loading}/>):(
+  return (
     <div className="addTrainer-page">
       <div className="wizard">
         <div className="wizard-inner">
@@ -281,186 +281,9 @@ function AddTrainer() {
           </div>
         </section>
       )}
-      {/* {tab === 2 && (
-        <section>
-          <div className="Section">
-            <div className="SubSection">
-              <div className="SectionHeader" style={{ marginLeft: '9rem', marginBottom: '2rem' }}>
-                <span>Qualification Details</span>
-              </div>
-              <div
-                className="SectionForm_AddTrainer"
-                style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <div className="SectionForm_InputContainer_AddTrainer2">
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="tenthschoolname"
-                    placeholder="School Name"
-                    value={formData.tenthschoolname}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="tenthboard"
-                    placeholder="Board"
-                    value={formData.tenthboard}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="tenthpercentage"
-                    placeholder="Percentage/CGPA"
-                    value={formData.tenthpercentage}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <div className="Custom_ImageUploader_Preview_Container_AddTrainer2">
-                    <input
-                      className="Auth_Input"
-                      type="text"
-                      name="tenthmarksheet"
-                      placeholder="10th Marksheet"
-                      value={formData.tenthmarksheet}
-                      onChange={(e) => handleInputChange(e)}
-                    />
-                    <input
-                      className="Uploader_AddTrainer"
-                      type="file"
-                      accept=".jpg, .png,"
-                      name="tenthmarksheetimage"
-                      onChange={(e) => handleFileChange(e)}
-                      style={{ zIndex: 10 }}
-                    />
-                    <MdOutlineFileUpload
-                      className="Uploader_AddTrainer"
-                      fill="black"
-                      style={{ opacity: 1 }}
-                    />
-                  </div>
-                </div>
-                <div className="SectionForm_InputContainer_AddTrainer2">
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="twelthschoolname"
-                    placeholder="School Name"
-                    value={formData.twelthschoolname}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="twelfthboard"
-                    placeholder="Board"
-                    value={formData.twelfthboard}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="twelfthpercentage"
-                    placeholder="Percentage/CGPA"
-                    value={formData.twelfthpercentage}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <div className="Custom_ImageUploader_Preview_Container_AddTrainer2">
-                    <input
-                      className="Auth_Input"
-                      type="text"
-                      name="twelfthmarksheet"
-                      placeholder="12th Marksheet"
-                      value={formData.twelfthmarksheet}
-                      onChange={(e) => handleInputChange(e)}
-                    />
-                    <input
-                      className="Uploader_AddTrainer"
-                      type="file"
-                      accept=".jpg, .png,"
-                      name="twelfthmarksheetimage"
-                      onChange={(e) => handleFileChange(e)}
-                      style={{ zIndex: 10 }}
-                    />
-                    <MdOutlineFileUpload
-                      className="Uploader_AddTrainer"
-                      fill="black"
-                      style={{ opacity: 1 }}
-                    />
-                  </div>
-                </div>
-                <div className="SectionForm_InputContainer_AddTrainer2">
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="graduationcollege"
-                    placeholder="College Name"
-                    value={formData.graduationcollege}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="graduationuniversity"
-                    placeholder="University Name"
-                    value={formData.graduationuniversity}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="graduationpercentage"
-                    placeholder="Percentage/CGPA"
-                    value={formData.graduationpercentage}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <div className="Custom_ImageUploader_Preview_Container_AddTrainer2">
-                    <input
-                      className="Auth_Input"
-                      type="text"
-                      name="graduationmarksheet"
-                      placeholder="Graduation Marksheet"
-                      value={formData.graduationmarksheet}
-                      onChange={(e) => handleInputChange(e)}
-                    />
-                    <input
-                      className="Uploader_AddTrainer"
-                      type="file"
-                      accept=".jpg, .png,"
-                      name="graduationmarksheetimage"
-                      onChange={(e) => handleFileChange(e)}
-                      style={{ zIndex: 10 }}
-                    />
-                    <MdOutlineFileUpload
-                      className="Uploader_AddTrainer"
-                      fill="black"
-                      style={{ opacity: 1 }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '100%'
-                }}>
-                <div className="SectionForm_ButtonContainer_AddTrainer" style={{ width: '80%' }}>
-                  <button type="button" onClick={() => setTab(1)}>
-                    Previous
-                  </button>
-                  <button type="button" onClick={() => setTab(3)}>
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )} */}
+     
       {tab === 2 && (
-        <section>
+        loading ? (<Loader loading={loading}/>):<section>
           <div className="Section">
             <div className="SubSection">
               <div className="SectionHeader" style={{ marginLeft: '9rem', marginBottom: '2rem' }}>

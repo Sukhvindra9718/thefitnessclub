@@ -16,25 +16,28 @@ const pool = new Pool({
 });
 
 exports.registerTrainer = CatchAsyncErrors(async (req, res, next) => {
-  const {firstname,
-  lastname,
-  AadharCard,
-  DOB,
-  Address,
-  email,
-  phoneNumber,
-  pincode,
-  city,
-  state,
-  country,
-  bankname,
-  salary,
-  accountNumber,
-  IFSCCode,
-  status,
-  joiningDate} =req.body;
-  
-  const profileImage = req?.file?.buffer === undefined ? undefined : req.file.buffer; // multer file buffer
+  const {
+    firstname,
+    lastname,
+    AadharCard,
+    DOB,
+    Address,
+    email,
+    phoneNumber,
+    pincode,
+    city,
+    state,
+    country,
+    bankname,
+    salary,
+    accountNumber,
+    IFSCCode,
+    status,
+    joiningDate,
+  } = req.body;
+
+  const profileImage =
+    req?.file?.buffer === undefined ? undefined : req.file.buffer; // multer file buffer
 
   const otp = Math.floor(100000 + Math.random() * 900000);
   const hashedPassword = await bcrypt.hash(firstname, 10);
@@ -43,7 +46,7 @@ exports.registerTrainer = CatchAsyncErrors(async (req, res, next) => {
   const role = "trainer";
   const resetPasswordToken = undefined;
   const resetPasswordTokenExpire = undefined;
- 
+
   const query =
     "INSERT INTO trainer (firstname,lastname,AadharCard,DOB,Address,email,phoneNumber,pincode,city,state,country,bankname,salary,accountNumber,IFSCCode,status,joiningDate,otp,isVerified,role,profile_image,createdAt,resetPasswordToken,resetPasswordTokenExpire,gymOwnerId,password) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26)";
 
@@ -126,7 +129,7 @@ exports.registerTrainer = CatchAsyncErrors(async (req, res, next) => {
       resetPasswordToken,
       resetPasswordTokenExpire,
       gymOwnerId,
-      hashedPassword
+      hashedPassword,
     ]);
 
     const result = await SendEmail({
@@ -393,27 +396,29 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, phoneNumber, address, role } = req.body;
   const profileImage =
     req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
 
-  const user = await getUserFromDatabase("id", req.user.id);
-  let newRole = role != undefined ? role : user.role;
-
   const newUserData = {
-    name: name,
-    email: email,
-    password: user.password,
-    phonenumber: phoneNumber,
-    address: address,
-    otp: user.otp,
-    isverified: user.isverified,
-    role: newRole,
-    profile_image:
-      profileImage === undefined ? user.profile_image : profileImage,
-    createdat: user.createdat,
-    resetpasswordtoken: user.resetpasswordtoken,
-    resetpasswordtokenexpire: user.resetpasswordtokenexpire,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    aadharcard: req.body.aadharcard,
+    dob: req.body.dob,
+    address: req.body.address,
+    email: req.body.email,
+    phonenumber: req.body.phonenumber,
+    pincode: req.body.pincode,
+    city: req.body.city,
+    state: req.body.state,
+    country: req.body.country,
+    bankname: req.body.bankname,
+    salary: req.body.salary,
+    accountnumber: req.body.accountnumber,
+    ifsccode: req.body.ifsccode,
+    status: req.body.status,
+    joiningdate: req.body.joiningdate,
+    profile_image: profileImage,
+    id: req.body.id,
   };
 
   updateUserInDatabase(newUserData);
@@ -424,7 +429,7 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllTrainers = CatchAsyncErrors(async (req, res, next) => {
-  console.log("get all trainer")
+  console.log("get all trainer");
   let trainers1 = [];
   try {
     const client = await pool.connect();
@@ -452,6 +457,7 @@ exports.getAllTrainers = CatchAsyncErrors(async (req, res, next) => {
 
 exports.deleteTrainer = CatchAsyncErrors(async (req, res, next) => {
   const userId = req.params.id;
+  console.log(userId)
   try {
     const client = await pool.connect();
     const query = `DELETE FROM trainer WHERE id = $1`;
@@ -508,25 +514,58 @@ const getUserFromDatabase = async (findById, value) => {
 const updateUserInDatabase = async (user) => {
   try {
     const client = await pool.connect();
-    const query =
-      "UPDATE trainer SET name = $1, email = $2, password = $3, phonenumber = $4, address = $5, otp = $6, isverified = $7, role = $8, profile_image = $9,createdat = $10, resetpasswordtoken = $11, resetpasswordtokenexpire = $12 WHERE email = $2";
+    if (user.profile_image === undefined) {
+      const query =
+        "UPDATE trainer SET firstname = $1, lastname = $2, email = $3, phonenumber = $4,pincode = $5, dob = $6, city = $7, aadharcard = $8, state = $9, address = $10, country = $11, joiningdate = $12, status = $13, bankname = $14,accountnumber = $15, ifsccode = $16,salary = $17 WHERE id = $18";
+      await client.query(query, [
+        user.firstname,
+        user.lastname,
+        user.email,
+        user.phonenumber,
+        user.pincode,
+        user.dob,
+        user.city,
+        user.aadharcard,
+        user.state,
+        user.address,
+        user.country,
+        user.joiningdate,
+        user.status,
+        user.bankname,
+        user.accountnumber,
+        user.ifsccode,
+        user.salary,
+        user.id,
+      ]);
+    } else {
+      const query =
+        "UPDATE trainer SET firstname = $1, lastname = $2, email = $3, phonenumber = $4,pincode = $5, dob = $6, city = $7, aadharcard = $8, state = $9, address = $10, country = $11, joiningdate = $12, status = $13, bankname = $14,accountnumber = $15, ifsccode = $16,salary = $17,profile_image = $18 WHERE id = $19";
 
-    await client.query(query, [
-      user.name,
-      user.email,
-      user.password,
-      user.phonenumber,
-      user.address,
-      user.otp,
-      user.isverified,
-      user.role,
-      user.profile_image,
-      user.createdat,
-      user.resetpasswordtoken,
-      user.resetpasswordtokenexpire,
-    ]);
+      await client.query(query, [
+        user.firstname,
+        user.lastname,
+        user.email,
+        user.phonenumber,
+        user.pincode,
+        user.dob,
+        user.city,
+        user.aadharcard,
+        user.state,
+        user.address,
+        user.country,
+        user.joiningdate,
+        user.status,
+        user.bankname,
+        user.accountnumber,
+        user.ifsccode,
+        user.salary,
+        user.profile_image,
+        user.id,
+      ]);
+    }
   } catch (error) {
-    return next(new ErrorHandler(error.message, 400));
+    console.log(error);
+    return error;
   }
 };
 
@@ -601,4 +640,3 @@ function addMinutes(date, minutes) {
 //   {name: "resetPasswordTokenExpire", type: "timestamptz" },
 // ]
 // createTable("trainer", columns);
-
