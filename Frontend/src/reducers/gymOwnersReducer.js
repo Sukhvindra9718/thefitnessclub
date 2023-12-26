@@ -72,7 +72,8 @@ import {
           ...state,
           loading: false,
           loginStatus:action.payload.success,
-          token:action.payload.token
+          token:action.payload.token,
+          user:action.payload.user
         };
   
       case LOGIN_FAIL:

@@ -1,9 +1,9 @@
-const ErrorHandler = require("../utils/Errorhandler.js");
+const ErrorHandler = require("../Utils/ErrorHandler");
 
-module.exports = (err, req, res, next) => {
+module.exports =  (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
-  err.message = err.message || "Internal Server Error";
-
+  err.message = err.message || "Internal Server Error1";
+console.log(err.message)
   // Wrong Mongodb Id error
   if (err.name === "CastError") {
     const message = `Resource not found. Invalid: ${err.path}`;
@@ -25,6 +25,12 @@ module.exports = (err, req, res, next) => {
   // JWT EXPIRE error
   if (err.name === "TokenExpiredError") {
     const message = `Json Web Token is Expired, Try again `;
+    err = new ErrorHandler(message, 400);
+  }
+
+  if(err.name === "AxiosError"){
+    console.log(err.name)
+    const message = `Something went wrong with the API`;
     err = new ErrorHandler(message, 400);
   }
 

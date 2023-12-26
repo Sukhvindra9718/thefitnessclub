@@ -41,7 +41,7 @@ function Main({ active }) {
   }, [])
 
   return loading?(<Loader loading={loading}/>):(
-    <div style={{ height: '100%' }}>
+    <div className='main'>
       {active === 0 && user?.role === 'admin' && <DashboardOverview />}
       {active === 1 && user?.role === 'admin' && <EnquiryOverview />}
       {active === 2 && user?.role === 'admin' && <MembershipOverview gymOwners={gymOwners}/>}

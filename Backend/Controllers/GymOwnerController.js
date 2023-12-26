@@ -5,6 +5,7 @@ const SendEmail = require("../Utils/SendEmail.js");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const { get } = require("http");
 // const jwt = require("jsonwebtoken");
 // const { createTable } = require("../Utils/checkIfTableExists.js");
 
@@ -121,6 +122,7 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
+  console.log("loginUser");
   const { email, password } = req.body;
   let user = null;
   //Checks if email and password is entered by user
@@ -128,8 +130,10 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email", email);
-  console.log("loginUser");
   //Checks if password is correct or not
+  if (!user) {
+    return next(new ErrorHandler("Invalid Email or Password", 401));
+  }
   if (user.isverified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
   }
@@ -138,10 +142,13 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Email or Password", 401));
   }
 
+  user.profile_image = user.profile_image.toString("base64");
+  user.gymlogo = user.gymlogo.toString("base64");
   sendToken(user, 200, res);
 });
 
 exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
+  console.log("VerifyUser");
   const { email, otp } = req.body;
 
   //Checks if otp is valid entered by user
@@ -166,7 +173,7 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
       await client.query(query, ["", true, email]);
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
-    } 
+    }
     sendToken(user, 200, res);
   } else {
     return next(new ErrorHandler("Invalid otp", 401));
@@ -174,6 +181,7 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
+  console.log("LogoutUser");
   res.cookie("token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
@@ -185,7 +193,7 @@ exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
-  console.log("GetUserDetail")
+  console.log("GetUserDetail");
   req.user.profile_image = req.user.profile_image.toString("base64");
   req.user.gymlogo = req.user.gymlogo.toString("base64");
   let user = req.user;
@@ -196,6 +204,7 @@ exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.forgotPassword = CatchAsyncErrors(async (req, res, next) => {
+  console.log("ForgotPassword");
   // send forgot password email
   const { email } = req.body;
   const user = await getUserFromDatabase("email", email);
@@ -284,6 +293,7 @@ exports.forgotPassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.resetPassword = CatchAsyncErrors(async (req, res, next) => {
+  console.log("ResetPassword");
   const { newPassword, confirmPassword } = req.body;
   const user = await getUserFromDatabase(
     "resetpasswordtoken",
@@ -337,6 +347,7 @@ exports.resetPassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
+  console.log("UpdatePassword");
   if (req.body.newPassword !== req.body.confirmPassword) {
     return next(new ErrorHandler("Confirm Password does not match", 400));
   }
@@ -368,7 +379,7 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
-  console.log("UpdateProfile")
+  console.log("UpdateProfile");
   const { name, email, phoneNumber, address, role } = req.body;
   const profileImage =
     req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
@@ -399,7 +410,7 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
   });
 });
 exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
-  console.log("CompleteProfile")
+  console.log("CompleteProfile");
   const {
     AadharCard,
     DOB,
@@ -412,14 +423,12 @@ exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
     Address1,
     Address2,
   } = req.body;
-  const status = 'active';
+  const status = "active";
   const address = Address1 + " " + Address2;
   const prebookeddate = new Date();
   const GymLogo = req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
 
-
   const query = `UPDATE users SET gymlogo = $1, gymregnum = $2, gymname = $3, gymadd = $4, adhaarcardno = $5, membership_type=$6,membership_price=$7,membership_duration = $8,status=$9,address=$10,dob= $11,prebookeddate=$12 WHERE email = $13`;
-
 
   await pool.query(query, [
     GymLogo,
@@ -444,7 +453,7 @@ exports.completeProfile = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
-  console.log("GetAllUsers")
+  console.log("GetAllUsers");
   let gymOwners = [];
   try {
     const client = await pool.connect();
@@ -465,6 +474,7 @@ exports.getAllUsers = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
+  console.log("DeleteUser");
   const userId = req.params.id;
   try {
     const client = await pool.connect();
@@ -480,6 +490,7 @@ exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.takeMembership = CatchAsyncErrors(async (req, res, next) => {
+  console.log("TakeMembership");
   const { email, membershipType, membershipPrice, membershipDuration } =
     req.body;
 
@@ -502,6 +513,49 @@ exports.takeMembership = CatchAsyncErrors(async (req, res, next) => {
     membership,
   });
 });
+exports.updateRevenueAndTraineeCount = CatchAsyncErrors(
+  async (req, res, next) => {
+    const getAllGymOwnerQuery =
+      "Select {revenuerecord,traineecountmonthly} from users where role = 'gymOwner'";
+    const getAllGymOwnerResult = await pool.query(getAllGymOwnerQuery, []);
+
+    getAllGymOwnerResult.rows.forEach(async (gymOwner) => {
+      // get all trainee
+      const traineeQuery = "Select * from trainee where gymownerid = $1";
+      const traineeCountResult = await pool.query(traineeQuery, [gymOwner.id]);
+
+      // get all revenue
+      const revenueCount = traineeCountResult.rows.reduce((acc, trainee) => {
+        return acc + trainee.totalamount / trainee.duration;
+      }, 0);
+      gymOwner.revenuerecord = [
+        ...req.body.revenuerecord,
+        revenueCount.toFixed(2),
+      ];
+      req.body.traineecountmonthly = [
+        ...req.body.traineecountmonthly,
+        traineeCountResult.rows.length,
+      ];
+
+      // let gymOwner = null;
+      try {
+        const query = `UPDATE users SET revenuerecord = $1, traineecountmonthly = $2 WHERE id = $3`;
+        await pool.query(query, [
+          req.body.revenuerecord,
+          req.body.traineecountmonthly,
+          req.user.id,
+        ]);
+        gymOwner = await getUserFromDatabase("id", req.user.id);
+      } catch (error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+    });
+    res.status(200).json({
+      success: true,
+      gymOwner,
+    });
+  }
+);
 
 const getUserFromDatabase = async (findById, value) => {
   let user = null;
@@ -513,7 +567,6 @@ const getUserFromDatabase = async (findById, value) => {
     if (result.rows.length !== 0) {
       user = result.rows[0];
     }
-
   } catch (error) {
     return new ErrorHandler(error.message, 400);
   }

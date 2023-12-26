@@ -68,6 +68,7 @@ function AddTrainer() {
     setLoading(true)
     if(formData.firstname === '' || formData.lastname === '' || formData.AadharCard === '' || formData.DOB === '' || formData.Address === '' || formData.email === '' || formData.phoneNumber === '' || formData.pincode === '' || formData.city === '' || formData.state === '' || formData.country === '' || formData.bankname === '' || formData.salary === '' || formData.accountNumber === '' || formData.IFSCCode === '' || formData.status === '' || formData.joiningDate === '' || formData.profileImage === ''){ 
       alert('Please fill all the fields')
+      setLoading(false)
       return
     }
 
@@ -146,7 +147,7 @@ function AddTrainer() {
         <section>
           <div className="Section">
             <div className="SubSection">
-              <div className="SectionHeader">
+              <div className="SectionHeader"  style={{paddingLeft:"5rem"}}>
                 <span>Personal Details</span>
               </div>
               <div className="SectionForm_AddTrainer">
@@ -271,8 +272,7 @@ function AddTrainer() {
                   />
                 </div>
               </div>
-              <div className="SectionForm_ButtonContainer_AddTrainer">
-                <div></div>
+              <div className="SectionForm_ButtonContainer_AddTrainer" style={{width:"97%",justifyContent:"flex-end"}}>
                 <button type="button" onClick={() => setTab(2)}>
                   Next
                 </button>
@@ -285,8 +285,8 @@ function AddTrainer() {
       {tab === 2 && (
         loading ? (<Loader loading={loading}/>):<section>
           <div className="Section">
-            <div className="SubSection">
-              <div className="SectionHeader" style={{ marginLeft: '9rem', marginBottom: '2rem' }}>
+            <div className="SubSection" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div className="SectionHeader" style={{marginBottom: '2rem',width:"80%" }}>
                 <span>Account Details</span>
               </div>
               <div className="SectionForm_AddTrainer" style={{ justifyContent: 'center' }}>

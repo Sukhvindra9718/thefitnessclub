@@ -70,7 +70,7 @@ function Sidebar({ active, setActive }) {
 
         {user?.role === 'gymOwner' && <div
           className={active === 0 ? 'sidebar-menu-item selected' : 'sidebar-menu-item'}
-          onClick={() => setActive(7)}>
+          onClick={() => setActive(0)}>
           <BiSolidDashboard fill={active === 0 ? '#fff' : '#717171'} size={30} />
           <h4>Dashboard</h4>
         </div>}

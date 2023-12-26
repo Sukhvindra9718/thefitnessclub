@@ -15,6 +15,10 @@ function Dashboard() {
       setActive(state.trainer)
       delete state.trainer
     }
+    if(state?.trainee){
+      setActive(state.trainee)
+      delete state.trainee
+    }
   }, [])
 
   return (

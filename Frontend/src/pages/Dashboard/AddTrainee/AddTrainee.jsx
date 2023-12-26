@@ -1,12 +1,18 @@
 import React, { useState } from 'react'
 import '../../../Style/AddTrainer.css'
-import { FaUser, FaUserGraduate } from 'react-icons/fa'
+import { FaUser } from 'react-icons/fa'
 import { MdPayment, MdOutlineVerifiedUser } from 'react-icons/md'
 import { CitySelect, CountrySelect, StateSelect } from '@davzon/react-country-state-city'
 import '@davzon/react-country-state-city/dist/react-country-state-city.css'
 import { TbCameraUp } from 'react-icons/tb'
 import { GrSchedule } from "react-icons/gr";
 import { useNavigate } from 'react-router-dom'
+import Loader from '../../../components/Loader'
+import Cookies from 'js-cookie'
+import axios from 'axios'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function AddTrainee() {
   const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
@@ -15,7 +21,7 @@ function AddTrainee() {
   const [otp, setOtp] = useState('')
   const [tab, setTab] = useState(1)
   const navigate = useNavigate()
-
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
@@ -28,19 +34,24 @@ function AddTrainee() {
     city: '',
     state: '',
     country: '',
-    bankname: '',
-    salary: '',
-    accountNumber: '',
-    IFSCCode: '',
+    status: 'active',
+    extentMembership: 0,
+    discount: 0,
+    receiptNumber: `${Math.floor(Math.random() * 10000)+ '-'+calculateEndDate(new Date(), 0)+'-'+Math.floor(Math.random() * 10000)}`,
     gender: '',
-    joiningDate: '',
     profileImage: '',
-    group: '',
-    plan: '',
-    duration: 1,
-    startdate: calculateEndDate(new Date(), 0)
+    group: 'solo',
+    plan:'1',
+    planStartDate: calculateEndDate(new Date(), 0),
   })
-  const [enddate, setEndDate] = useState(calculateEndDate(new Date(), 1))
+  const [planEndDate, setPlanEndDate] = useState(calculateEndDate(new Date(), 1))
+  const [plan, setPlan] = useState('Monthly')
+  const [duration, setDuration] = useState(1)
+  const [planPrice, setPlanPrice] = useState(1000)
+  const [totalAmount, setTotalAmount] = useState(1000)
+  const [amountPaid, setAmountPaid] = useState(0)
+  const [offers, setOffers] = useState(100)
+  const [modeOfPayment, setModeOfPayment] = useState('')
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -64,7 +75,57 @@ function AddTrainee() {
   }
   const handleVerify = (e) => {
     e.preventDefault()
-    navigate('/dashboard')
+    const config = {
+      headers: { 'Content-Type': 'application/json' }
+    }
+    const { email } = formData;
+    axios.post('http://localhost:3001/api/v1/trainee/verify', { email, otp }, config).then((res) => {
+      if (res.data.success) {
+        setLoading(false)
+        toast.success('Email Verified', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setTimeout(() => {
+          navigate('/dashboard', { state: { trainee: 9 } })
+        }, 2000)
+      } else {
+        setLoading(false)
+      }
+    }).catch((error) => {
+      if (error.isAxiosError && error.response && error.response.data) {
+        const errorMessage = error.response.data.message;
+        toast.error(errorMessage, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setLoading(false)
+      } else {
+        toast.error('An unexpected error occurred. Please try again', {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setLoading(false)
+      }
+    })
   }
 
   function calculateEndDate(currentDate, months) {
@@ -74,23 +135,167 @@ function AddTrainee() {
     }
 
     // Calculate the end date by adding the specified number of months
-    const endDate = new Date(
+    const planEndDate = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + months,
       currentDate.getDate() + 1
     )
 
     // Format the end date as 'YYYY-MM-DD'
-    const formattedEndDate = endDate.toISOString().split('T')[0]
+    const formattedEndDate = planEndDate.toISOString().split('T')[0]
 
     return formattedEndDate
   }
   const handlePlanChange = (e) => {
     const a = parseInt(e.target.value)
-    setFormData({ ...formData, plan: parseInt(e.target.value) })
-    setFormData({ ...formData, duration: parseInt(e.target.value) })
-    setEndDate(() => calculateEndDate(new Date(), a))
+    const planInText = a === 1 ? 'Monthly' : a === 3 ? 'Quarterly' : a === 6 ? 'Half Yearly' : 'Yearly'
+    setPlan(planInText)
+    setFormData({ ...formData, plan: e.target.value})
+    setDuration(a)
+    setPlanEndDate(() => calculateEndDate(new Date(), a))
+
+    if (a === 1) {
+      setPlanPrice(1000)
+      setTotalAmount(1000 + ((1000 * 0.18) - offers))
+    } else if (a === 3) {
+      setPlanPrice(2500)
+      setTotalAmount(2500 + ((2500 * 0.18) - offers))
+    } else if (a === 6) {
+      setPlanPrice(4500)
+      setTotalAmount(4500 + ((4500 * 0.18) - offers))
+    } else if (a === 12) {
+      setPlanPrice(7000)
+      setTotalAmount(7000 + ((7000 * 0.18) - offers))
+    }
+
   }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setLoading(true)
+    if (formData.firstname === '' ||
+      formData.lastname === '' ||
+      formData.AadharCard === '' ||
+      formData.DOB === '' ||
+      formData.Address === '' ||
+      formData.email === '' ||
+      formData.phoneNumber === '' ||
+      formData.pincode === '' ||
+      formData.city === '' ||
+      formData.state === '' ||
+      formData.country === '' ||
+      formData.status === '' ||
+      formData.joiningDate === '' ||
+      formData.profileImage === '' ||
+      formData.modeOfPayment === '' ||
+      formData.gender === '' ||
+      formData.group === '' ||
+      formData.planStartDate === '' ||
+      planEndDate === '' ||
+      planPrice === '' ||
+      totalAmount === '' ||
+      amountPaid === '' ||
+      modeOfPayment === '' ||
+      plan === '' ||
+      duration === '') {
+
+      toast.info('Please fill all the fields', {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      setLoading(false)
+      // return
+    }
+
+    const newFormData = new FormData();
+    newFormData.append('firstname', formData.firstname)
+    newFormData.append('lastname', formData.lastname)
+    newFormData.append('AadharCard', formData.AadharCard)
+    newFormData.append('DOB', formData.DOB)
+    newFormData.append('Address', formData.Address)
+    newFormData.append('email', formData.email)
+    newFormData.append('phoneNumber', formData.phoneNumber)
+    newFormData.append('pincode', formData.pincode)
+    newFormData.append('city', formData.city)
+    newFormData.append('state', formData.state)
+    newFormData.append('country', formData.country)
+    newFormData.append('status', formData.status)
+    newFormData.append('extentMembership', formData.extentMembership)
+    newFormData.append('discount', formData.discount)
+    newFormData.append('receiptNumber', formData.receiptNumber)
+    newFormData.append('gender', formData.gender)
+    newFormData.append('joiningDate', formData.planStartDate)
+    newFormData.append('group', formData.group)
+    newFormData.append('planStartDate', formData.planStartDate)
+    newFormData.append('planEndDate', planEndDate)
+    newFormData.append('plan', plan)
+    newFormData.append('duration', duration)
+    newFormData.append('planPrice', planPrice)
+    newFormData.append('totalAmount', totalAmount)
+    newFormData.append('amountPaid', amountPaid)
+    newFormData.append('balanceAmount', totalAmount - amountPaid)
+    newFormData.append('modeOfPayment', modeOfPayment)
+    newFormData.append('profile_image', formData.profileImage)
+
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'Multipart/Form-Data', Authorization: `Bearer ${token}` }
+    }
+
+    axios.post('http://localhost:3001/api/v1/trainee/register', newFormData, config).then((res) => {
+      if (res.data.success) {
+        toast.success('Trainee Added Successfully', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setLoading(false)
+        setTab(4)
+      } else {
+        setLoading(false)
+      }
+    }).catch((error) => {
+      if (error.isAxiosError && error.response && error.response.data) {
+        const errorMessage = error.response.data.message;
+        toast.error(errorMessage, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setLoading(false)
+      } else {
+        toast.error('An unexpected error occurred. Please try again.', {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+        setLoading(false)
+      }
+    })
+  }
+
+
   return (
     <div className="addTrainer-page">
       <div className="wizard">
@@ -141,7 +346,7 @@ function AddTrainee() {
         <section>
           <div className="Section">
             <div className="SubSection">
-              <div className="SectionHeader">
+              <div className="SectionHeader" style={{ paddingLeft: "5rem" }}>
                 <span>Personal Details</span>
               </div>
               <div className="SectionForm_AddTrainer">
@@ -267,8 +472,7 @@ function AddTrainee() {
                   />
                 </div>
               </div>
-              <div className="SectionForm_ButtonContainer_AddTrainer">
-                <div></div>
+              <div className="SectionForm_ButtonContainer_AddTrainer" style={{ width: "97%", justifyContent: "flex-end" }}>
                 <button type="button" onClick={() => setTab(2)}>
                   Next
                 </button>
@@ -280,8 +484,8 @@ function AddTrainee() {
       {tab === 2 && (
         <section>
           <div className="Section">
-            <div className="SubSection">
-              <div className="SectionHeader" style={{ marginLeft: '9rem', marginBottom: '1rem' }}>
+            <div className="SubSection" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div className="SectionHeader" style={{ marginBottom: '1rem', width: "83%" }}>
                 <span>Choose Plan</span>
               </div>
               <div className="SectionForm_AddTrainer" style={{ justifyContent: 'center' }}>
@@ -290,16 +494,18 @@ function AddTrainee() {
                     <label>Group</label>
                     <select
                       onChange={(e) => setFormData({ ...formData, group: e.target.value })}
-                      className="Auth_Input">
+                      className="Auth_Input"
+                      name='group'
+                      value={formData.group}>
                       <option value={'solo'}>Solo</option>
                       <option value={'couple'}>Couple</option>
                     </select>
                   </div>
                   <div>
                     <label>Plan</label>
-                    <select onChange={handlePlanChange} className="Auth_Input">
+                    <select onChange={handlePlanChange} className="Auth_Input" value={formData.plan} name="plan">
                       <option value={'1'}>Monthly</option>
-                      <option value={'3'}>Quaterly</option>
+                      <option value={'3'}>Quarterly</option>
                       <option value={'6'}>Half Yearly</option>
                       <option value={'12'}>Yearly</option>
                     </select>
@@ -312,9 +518,9 @@ function AddTrainee() {
                       name="duration"
                       placeholder="Duration"
                       value={
-                        formData.duration === 1
-                          ? formData.duration + ' Month'
-                          : formData.duration + ' Months'
+                        duration === 1
+                          ? duration + ' Month'
+                          : duration + ' Months'
                       }
                       disabled={true}
                     />
@@ -324,9 +530,9 @@ function AddTrainee() {
                     <input
                       className="Auth_Input"
                       type="text"
-                      name="startdate"
+                      name="planStartDate"
                       placeholder="Start Date"
-                      value={formData.startdate}
+                      value={formData.planStartDate}
                       disabled={true}
                     />
                   </div>
@@ -335,11 +541,23 @@ function AddTrainee() {
                     <input
                       className="SignUp_Email Auth_Input"
                       type="text"
-                      name="enddate"
+                      name="planEndDate"
                       placeholder="End Date"
-                      value={enddate}
+                      value={planEndDate}
                       disabled={true}
                     />
+                  </div>
+                  <div>
+                    <label>Status</label>
+                    <select
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                      className="Auth_Input"
+                      name='status'
+                      value={formData.status}>
+                      <option value={'active'}>Active</option>
+                      <option value={'pending'}>Pending</option>
+                      <option value={'inactive'}>InActive</option>
+                    </select>
                   </div>
                 </div>
                 <div className="view-plan-container">
@@ -376,55 +594,126 @@ function AddTrainee() {
         </section>
       )}
       {tab === 3 && (
-        <section>
+        loading ? (<Loader loading={loading} />) : <section>
           <div className="Section">
-            <div className="SubSection">
-              <div className="SectionHeader" style={{ marginLeft: '9rem', marginBottom: '2rem' }}>
+            <div className="SubSection" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+              <div className="SectionHeader" style={{ marginBottom: '2rem', width: "90%" }}>
                 <span>Payment Details</span>
               </div>
-              <div className="SectionForm_AddTrainer" style={{ justifyContent: 'center' }}>
-                <div className="SectionForm_InputContainer_AddTrainer3">
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="bankname"
-                    placeholder="Bank Name"
-                    value={formData.bankname}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="accountNumber"
-                    placeholder="Account Number"
-                    value={formData.accountNumber}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="text"
-                    name="IFSCCode"
-                    placeholder="IFSC Code"
-                    value={formData.IFSCCode}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="SignUp_Email Auth_Input"
-                    type="text"
-                    name="salary"
-                    placeholder="Salary"
-                    value={formData.salary}
-                    onChange={(e) => handleInputChange(e)}
-                  />
-                  <input
-                    className="Auth_Input"
-                    type="date"
-                    name="joiningDate"
-                    placeholder="Joining Date"
-                    aria-placeholder="Joining Date"
-                    value={formData.joiningDate}
-                    onChange={(e) => handleInputChange(e)}
-                  />
+              <div className="SectionForm_AddTrainee" style={{ justifyContent: 'center' }}>
+                <div className='PaymentSection-left'>
+                  <div className="SectionForm_PlanSelected_Container">
+                    <div className="SectionForm_PlanSelected">
+                      <div>
+                        <label>{plan}</label>
+                      </div>
+                      <div>
+                        <span>{duration} {duration === 1 ? ' Month' : ' Months'}</span>
+                      </div>
+                      <div>
+                        <span>{formData.planStartDate} - <span>{planEndDate} (+{formData.extentMembership} days)</span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="PaymentSection_InputContainer_AddTrainee">
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="extentMembership"
+                      placeholder="Extent Membership"
+                      value={formData.extentMembership}
+                      onChange={(e) => {
+                        setFormData({ ...formData, extentMembership: e.target.value })
+                        if (e.target.value !== '') {
+                          setTotalAmount(planPrice + (parseInt(e.target.value) * 30) - offers - parseInt(formData.discount) + (planPrice * 0.18))
+                        } else {
+                          setTotalAmount(planPrice - offers + (planPrice * 0.18) - parseInt(formData.discount))
+                        }
+                      }
+                      }
+                    />
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="discount"
+                      placeholder="Discount"
+                      value={formData.discount}
+                      onChange={(e) => {
+                        setFormData({ ...formData, discount: e.target.value })
+                        if (e.target.value !== '') {
+                          setTotalAmount(planPrice - parseInt(e.target.value) - offers + (parseInt(formData.extentMembership) * 30) + (planPrice * 0.18))
+                        } else {
+                          setTotalAmount(planPrice - offers + (parseInt(formData.extentMembership) * 30) + (planPrice * 0.18))
+                        }
+                      }}
+                    />
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="receiptNumber"
+                      placeholder="Receipt Number"
+                      value={formData.receiptNumber}
+                      onChange={(e) => handleInputChange(e)}
+                    />
+                    <select className="Auth_Input" onChange={(e) => setModeOfPayment(e.target.value)} value={modeOfPayment}>
+                      <option value="select">Select Mode of Payment</option>
+                      <option value="cash">Cash</option>
+                      <option value="cheque">Cheque</option>
+                      <option value="online">Online</option>
+                    </select>
+                  </div>
+                </div>
+                <div className='PaymentSection-right'>
+                  <div className='other-detail-container'>
+                    <div style={{ display: "flex", gap: "2rem", marginLeft: "2rem", width: "30%" }}>
+                      <div className='other-circle'></div>
+                      <div className='special-offer-container'>
+                        <label>Offers</label>
+                        <span>₹ {offers}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: "2rem", marginLeft: "2rem", width: "30%" }}>
+                      <div className='other-circle'></div>
+                      <div className='special-offer-container'>
+                        <label>GST</label>
+                        <span>₹ {planPrice * 0.18}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="PaymentSection_InputContainer_AddTrainee">
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="planPrice"
+                      placeholder="Plan Price"
+                      value={planPrice}
+                      onChange={(e) => setPlanPrice(e.target.value)}
+                    />
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="totalAmount"
+                      placeholder="Total Amount"
+                      value={totalAmount}
+                      onChange={(e) => setTotalAmount(e.target.value)}
+                    />
+                    <input
+                      className="Auth_Input"
+                      type="text"
+                      name="amountPaid"
+                      placeholder="Amount Paid"
+                      value={amountPaid}
+                      onChange={(e) => setAmountPaid(e.target.value)}
+                    />
+                    <input
+                      className="SignUp_Email Auth_Input"
+                      type="text"
+                      name="balanceAmount"
+                      placeholder="Balance Amount"
+                      value={totalAmount - amountPaid}
+                      readOnly={true}
+                    />
+                  </div>
                 </div>
               </div>
               <div
@@ -434,12 +723,12 @@ function AddTrainee() {
                   justifyContent: 'center',
                   width: '100%'
                 }}>
-                <div className="SectionForm_ButtonContainer_AddTrainer" style={{ width: '80%' }}>
+                <div className="SectionForm_ButtonContainer_AddTrainer" style={{ width: '90%' }}>
                   <button type="button" onClick={() => setTab(2)}>
                     Previous
                   </button>
-                  <button type="button" onClick={() => setTab(4)}>
-                    Next
+                  <button type="button" onClick={handleSubmit}>
+                    Submit
                   </button>
                 </div>
               </div>
@@ -466,13 +755,31 @@ function AddTrainee() {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
               />
-              <button type="button" className="verify-btn" onClick={handleVerify}>
-                Verify
-              </button>
+              <div style={{ display: "flex", gap: "1rem" }}>
+                <button type="button" className="verify-btn" onClick={handleVerify}>
+                  Verify
+                </button>
+                <button type="button" className="verify-btn" onClick={() => navigate('/dashboard', { state: { trainee: 9 } })}>
+                  Skip
+                </button>
+              </div>
+
             </div>
           </div>
         </section>
       )}
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   )
 }

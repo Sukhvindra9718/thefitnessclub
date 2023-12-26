@@ -1,15 +1,21 @@
 import React from 'react'
-import { Link,useNavigate } from 'react-router-dom'
-import { AiFillEye, AiFillEdit,AiOutlinePlus} from 'react-icons/ai'
+import { Link, useNavigate } from 'react-router-dom'
+import { AiFillEye, AiFillEdit, AiOutlinePlus } from 'react-icons/ai'
 import { MdDelete } from 'react-icons/md'
 import Pagination from '../components/Pagination.jsx'
 import filterImg from '../../../../src/assets/filter.svg'
-import {GrSort} from "react-icons/gr"
+import { GrSort } from "react-icons/gr"
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import Loader from "../../../components/Loader.jsx"
-const list = ['Membership Active', 'Membership Pending','Attendance Inactive',"Attendance Active",'Current Month Payments','Clear Filter']
-const sortList = ['Newest Transaction', 'Oldest Transaction','Nearest Due Date',"Farthest Due Date",'Member ID (Low to High)','Member ID (High to Low)']
+import PreviewTrainee from '../AddTrainee/PreviewTrainee.jsx'
+import UpdateTrainee from '../AddTrainee/UpdateTrainee.jsx'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+const list = ['Membership Active', 'Membership Pending', 'Attendance Inactive', "Attendance Active", 'Current Month Payments', 'Clear Filter']
+const sortList = ['Newest Transaction', 'Oldest Transaction', 'Nearest Due Date', "Farthest Due Date", 'Member ID (Low to High)', 'Member ID (High to Low)']
 
 
 
@@ -23,15 +29,21 @@ function TraineeOverview() {
   const [selected, setSelected] = React.useState('')
   const [selectedSortValue, setSelectedSortValue] = React.useState('')
   const [selectedDate, setSelectedDate] = React.useState('')
-  const [data,setData] = React.useState([])
-  const [trainees,setTrainees] = React.useState([])
-  const [loading,setLoading] = React.useState(true)
-  const totalPages = 5
+  const [data, setData] = React.useState([])
+  const [trainees, setTrainees] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
+  const [previewVisible, setPreviewVisible] = React.useState(false)
+  const [updateVisible, setUpdateVisible] = React.useState(false)
+  const [toastMessage, setToastMessage] = React.useState('')
+  const [toastType, setToastType] = React.useState('')
+  const [toastVisible, setToastVisible] = React.useState(false)
+  const [deleted,setDeleted] = React.useState(false)
+  const totalPages = trainees?.length>0 ? trainees.length/5 +2 : 5
   const navigate = useNavigate()
-  
+
   const getAllTrainees = () => {
     const token = Cookies.get('token');
-    const config = { headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}`} }
+    const config = { headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` } }
 
     axios.get(`http://192.168.1.12:3001/api/v1/trainee/getAllTrainee`, config).then((response) => {
       setData(response.data.trainees);
@@ -48,27 +60,27 @@ function TraineeOverview() {
   }
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
-    const filter = [...trainees].filter((item)=>item.createdat.split("T")[0]===e.target.value)
+    const filter = [...trainees].filter((item) => item.createdat.split("T")[0] === e.target.value)
     setData(filter)
   }
   const handleOptionClick = (label) => {
     setSelected(label)
     setShowFilter(!showfilter)
-    switch(label){
+    switch (label) {
       case "Membership Active":
-        setData([...trainees].filter((item)=>item.status==="active"))
+        setData([...trainees].filter((item) => item.status === "active"))
         break;
       case "Membership Pending":
-        setData([...trainees].filter((item)=>item.status==="pending"))
+        setData([...trainees].filter((item) => item.status === "pending"))
         break;
       case "Attendance Inactive":
-        setData([...trainees].filter((item)=>item.status==="inactive"))
+        setData([...trainees].filter((item) => item.status === "inactive"))
         break;
       case "Attendance Active":
-        setData([...trainees].filter((item)=>item.status==="active"))
+        setData([...trainees].filter((item) => item.status === "active"))
         break;
       case "Current Month Payments":
-        setData([...trainees].filter((item)=>item.status==="active"))
+        setData([...trainees].filter((item) => item.status === "active"))
         break;
       case "Clear Filter":
         setData([...trainees])
@@ -81,48 +93,118 @@ function TraineeOverview() {
   const handleSortOptionClick = (label) => {
     setSelectedSortValue(label)
     setShowSort(!showSort);
-    switch(label){
+    switch (label) {
       case "Newest Transaction":
-        setData([...trainees].sort((a,b)=>new Date(b.createdat)-new Date(a.createdat)))
+        setData([...trainees].sort((a, b) => new Date(b.createdat) - new Date(a.createdat)))
         break;
       case "Oldest Transaction":
-        setData([...trainees].sort((a,b)=>new Date(a.createdat)-new Date(b.createdat)))
+        setData([...trainees].sort((a, b) => new Date(a.createdat) - new Date(b.createdat)))
         break;
       case "Nearest Due Date":
-        setData([...trainees].sort((a,b)=>new Date(b.createdat)-new Date(a.createdat)))
+        setData([...trainees].sort((a, b) => new Date(b.createdat) - new Date(a.createdat)))
         break;
       case "Farthest Due Date":
-        setData([...trainees].sort((a,b)=>new Date(a.createdat)-new Date(b.createdat)))
+        setData([...trainees].sort((a, b) => new Date(a.createdat) - new Date(b.createdat)))
         break;
       case "Member ID (Low to High)":
-        setData([...trainees].sort((a,b)=>a.id-b.id))
+        setData([...trainees].sort((a, b) => a.id - b.id))
         break;
       case "Member ID (High to Low)":
-        setData([...trainees].sort((a,b)=>b.id-a.id))
+        setData([...trainees].sort((a, b) => b.id - a.id))
         break;
       default:
         break;
     }
   }
-  const handleSearch = ()=>{
-    const filterData = trainees.filter((item)=>item.firstname.toLowerCase().includes(search.toLowerCase()))
+  const handleSearch = () => {
+    const filterData = trainees.filter((item) => item.firstname.toLowerCase().includes(search.toLowerCase()))
     setData(filterData)
   }
+  const handleDelete = (id) => {
+    setLoading(true)
+    const token = Cookies.get('token')
+    const config = {
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }
+    }
+    axios
+      .delete(`http://localhost:3001/api/v1/trainee/deleteTrainee/${id}`, config)
+      .then((response) => {
+        if (response.data.success === true) {
+          setLoading(false)
+          setDeleted(!deleted)
+        }else{  
+          alert(response.data.message)
+          setLoading(false)
+        }
+      })
+      .catch((error) => {
+        if (error.isAxiosError && error.response && error.response.data) {
+          const errorMessage = error.response.data.message;
+          alert(`Error: ${errorMessage}`);
+          setLoading(false)
+        } else {
+          alert('An unexpected error occurred. Please try again.');
+          setLoading(false)
+        }
+      })
+  }
   React.useEffect(() => {
-    return () => { 
+    return () => {
       getAllTrainees();
-     }
-  }, [])  
+    }
+  }, [deleted])
 
 
-  return loading?(<Loader loading={loading}/>):(
+  React.useEffect(() => {
+    if(toastVisible){
+      if(toastType === "success"){
+        toast.success(toastMessage, {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+       
+      }else if(toastType === "error"){
+        toast.error(toastMessage, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }else{
+        toast.info(toastMessage, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
+    }
+    return () => {
+      getAllTrainees();
+    }
+  }, [toastVisible,toastMessage,toastType])
+  return loading ? (<Loader loading={loading} />) : (
     <div className="membership">
       <div className="filter-membership">
         <div className="filter-membership-container">
           <div className="header-table">
             <h1>All Trainers</h1>
-            <div className='add-btn' onClick={()=> navigate('/addtrainee')}>
-              <AiOutlinePlus size={25} style={{cursor:"pointer"}}/>
+            <div className='add-btn' onClick={() => navigate('/addtrainee')}>
+              <AiOutlinePlus size={25} style={{ cursor: "pointer" }} />
               <h1>Add Trainee</h1>
             </div>
           </div>
@@ -223,76 +305,80 @@ function TraineeOverview() {
         </div>
         <div className="table-body">
           {data?.length > 0 && data.map((item, index) => (
-            <div className="table-row" key={index}>
-              <div className="item2 item">
-                <h1>{item.id}</h1>
-              </div>
-              <div className="item1 item">
-                <div>
-                  <img
-                    src="https://www.w3schools.com/howto/img_avatar.png"
-                    alt="Avatar"
-                    className="avatar"
-                  />
+            (index >= (currentPage - 1)*4  && index <=  (currentPage-1) * 4 + 4 &&<div key={index}>
+              <div className="table-row" >
+                <div className="item2 item">
+                  <h1>{item.id}</h1>
                 </div>
-                <div>
-                  <h1>{item.firstname + ' '+ item.lastname}</h1>
-                  <p>{item.phonenumber}</p>
-                </div>
-              </div>
-              <div className="item3 item">
-                <div className="plan">
-                  <p>Monthly</p>
-                  <Link to="/dashboard/membership/plan">Change Plan</Link>
-                </div>
-              </div>
-              <div className="item4 item">
-                <div className="date">
-                  <div
-                    style={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around',
-                      alignItems: 'center'
-                    }}>
-                    <p>Next Due Date</p>
-                    <h3>{item.createdat.split("T")[0]}</h3>
+                <div className="item1 item">
+                  <div>
+                    <img
+                      src={'data:image/jpeg;base64,' + item.profile_image}
+                      alt="Avatar"
+                      className="avatar"
+                    />
                   </div>
-                  <div className="divider"></div>
-                  <div
-                    style={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-around',
-                      alignItems: 'center'
-                    }}>
-                    <p>Pre Booked Due Date</p>
-                    <h3>{item.createdat.split("T")[0]}</h3>
+                  <div>
+                    <h1>{item.firstname + ' ' + item.lastname}</h1>
+                    <p>{item.phonenumber}</p>
                   </div>
                 </div>
-              </div>
-              <div className="item5 item">
-                <div className="status-badge">
-                  <div className="circle"></div>
-                  <h1>{item.status}</h1>
+                <div className="item3 item">
+                  <div className="plan">
+                    <p>{item.plan}</p>
+                    <Link to="/dashboard/membership/plan">Change Plan</Link>
+                  </div>
+                </div>
+                <div className="item4 item">
+                  <div className="date">
+                    <div
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-around',
+                        alignItems: 'center'
+                      }}>
+                      <p>Plan End Date</p>
+                      <h3>{new Date(item.planenddate).toLocaleString().split(',')[0]}</h3>
+                    </div>
+                    <div className="divider"></div>
+                    <div
+                      style={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-around',
+                        alignItems: 'center'
+                      }}>
+                      <p>Plan Start Date</p>
+                      <h3>{new Date(item.planstartdate).toLocaleString().split(',')[0]}</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="item5 item">
+                  <div className="status-badge">
+                    <div className="circle"></div>
+                    <h1>{item.status}</h1>
+                  </div>
+                </div>
+                <div className="item6 item">
+                  <div className="actions">
+                    <Link onClick={() => setPreviewVisible(!previewVisible)}>
+                      <AiFillEye size={25} />
+                    </Link>
+                    <Link onClick={() => setUpdateVisible(!updateVisible)}>
+                      <AiFillEdit size={25} />
+                    </Link>
+                    <Link onClick={()=> handleDelete(item.id)}>
+                      <MdDelete size={25} />
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <div className="item6 item">
-                <div className="actions">
-                  <Link to="/dashboard/membership/view">
-                    <AiFillEye size={25} />
-                  </Link>
-                  <Link to="/dashboard/membership/edit">
-                    <AiFillEdit size={25} />
-                  </Link>
-                  <Link to="/dashboard/membership/delete">
-                    <MdDelete size={25} />
-                  </Link>
-                </div>
-              </div>
-            </div>
+              {previewVisible && (<PreviewTrainee setPreviewVisible={setPreviewVisible} user={item} />)}
+              {updateVisible && (<UpdateTrainee setUpdateVisible={setUpdateVisible} user={item} setToastMessage={setToastMessage} setToastType={setToastType} setToastVisible={setToastVisible}/>)}
+            </div>)
           ))}
         </div>
       </div>
@@ -303,6 +389,18 @@ function TraineeOverview() {
           onPageChange={handlePageChange}
         />
       </div>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   )
 }

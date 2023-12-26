@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-
 import './Header.css'
 import SignIn from '../../pages/Auth/SignIn'
 import SignUp from '../../pages/Auth/SignUp'
 import Verify from '../../pages/Auth/Verify'
 import Cookies from 'js-cookie'
-import Loader from '../Loader'
 import MyAccount from '../../pages/MyAccount'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+
 
 function Header() {
   const [signInVisible, SetSignInVisible] = useState(false)
@@ -18,11 +21,13 @@ function Header() {
   const [name, setName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [profileOption, setProfileOption] = useState(false)
-  const [userId, setUserId] = useState()
-  const [user, setUser] = useState()
   const [image, setImage] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState('')
+  const [toastVisible, setToastVisible] = useState(false)
+  const [user,setUser] = useState({})
   const navigate = useNavigate()
+
 
   const handleSignInVisibility = () => {
     // Disable scrolling
@@ -45,20 +50,43 @@ function Header() {
   const handleLogout = () => {
     Cookies.remove('user')
     Cookies.remove('token')
+    localStorage.removeItem('user')
     window.location.reload(false)
   }
 
   useEffect(() => {
-    const id = Cookies.get('user')
-    setUserId(id)
-    const data = JSON.parse(localStorage.getItem('user'))
-    setUser(data)
-    setLoading(false)
-  }, [])
+    const user = JSON.parse(localStorage.getItem('user'))
+    setUser(user)
+    if (toastVisible) {
+      if (toastType === 'success') {
+        toast.success(toastMessage, {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      } else {
+        toast.error(toastMessage, {
+          position: "bottom-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
+    }
+    // eslint-disable-next-line
+  }, [toastVisible])
 
-  return loading ? (
-    <Loader loading={loading} />
-  ) : (
+
+  return (
     <>
       <div className="Header">
         <div className="Header_Logo">
@@ -75,7 +103,7 @@ function Header() {
           <Link className="Link">Pages</Link>
           <Link className="Link">Contact</Link>
         </div>
-        {!userId ? (
+        {!user?.id ? (
           <div className="Header_Auth">
             <button
               onClick={() => handleSignInVisibility()}
@@ -112,7 +140,7 @@ function Header() {
           </div>
         )}
       </div>
-      {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} setUserId={setUserId} />}
+      {signInVisible && <SignIn SetSignInVisible={SetSignInVisible} setToastMessage={setToastMessage} setToastType={setToastType} setToastVisible={setToastVisible} setUser={setUser}/>}
       {signUpVisible && (
         <SignUp
           SetSignUpVisible={SetSignUpVisible}
@@ -138,6 +166,18 @@ function Header() {
           user={user}
         />
       )}
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   )
 }
