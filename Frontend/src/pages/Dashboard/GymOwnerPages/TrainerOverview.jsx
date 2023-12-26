@@ -41,7 +41,8 @@ function TrainerOverview() {
   const [loading, setLoading] = React.useState(true)
   const [previewVisible, setPreviewVisible] = React.useState(false)
   const [updateVisible, setUpdateVisible] = React.useState(false)
-  const totalPages = 5 // Replace with the actual total number of pages.
+  const [deleted,setDeleted]=React.useState(false)
+  const totalPages = trainers?.length>0 ? trainers.length/5 +2 : 5  // Replace with the actual total number of pages.
   const navigate = useNavigate()
 
   const getAllTrainers = () => {
@@ -137,18 +138,32 @@ function TrainerOverview() {
     axios
       .delete(`http://192.168.1.12:3001/api/v1/trainer/deleteTrainer/${id}`, config)
       .then((response) => {
-        console.log(response)
-        window.location.reload()
+        if(response.data.success){
+          alert("Trainer Deleted Successfully")
+          setDeleted(true)
+          setLoading(false)
+        }else{
+          alert("Something went wrong")
+          setLoading(false)
+        }
+       
       })
-      .catch((err) => {
-        console.log(err)
+      .catch((error) => {
+        if (error.isAxiosError && error.response && error.response.data) {
+          const errorMessage = error.response.data.message;
+          alert(`Error: ${errorMessage}`);
+          setLoading(false)
+        } else {
+          alert('An unexpected error occurred. Please try again.');
+          setLoading(false)
+        }
       })
   }
   React.useEffect(() => {
     return () => {
       getAllTrainers()
     }
-  }, [])
+  }, [deleted])
 
   return loading ? (
     <Loader loading={loading} />
@@ -257,7 +272,7 @@ function TrainerOverview() {
         <div className="table-body">
           {data?.length > 0 &&
             data.map((item, index) => (
-              <div key={index}>
+              (index >= (currentPage - 1)*4  && index <=  (currentPage-1) * 4 + 4 &&<div key={index}>
                 <div className="table-row">
                   <div className="item2 item">
                     <h1>{item.id}</h1>
@@ -318,7 +333,7 @@ function TrainerOverview() {
                   <PreviewTrainer setPreviewVisible={setPreviewVisible} user={item} />
                 )}
                 {updateVisible && <UpdateTrainer setUpdateVisible={setUpdateVisible} user={item} />}
-              </div>
+              </div>)
             ))}
         </div>
       </div>
@@ -334,3 +349,5 @@ function TrainerOverview() {
 }
 
 export default TrainerOverview
+
+

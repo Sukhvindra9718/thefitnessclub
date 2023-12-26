@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const app = express();
 const connectDB = require("./config/dbConnect");
-
+const Error = require("./Middlewares/Error");
 
 
 // Handle uncaught exceptions
@@ -65,3 +65,4 @@ process.on("SIGINT", function () {
   process.kill(process.pid, "SIGINT");
 });
 
+app.use(Error);

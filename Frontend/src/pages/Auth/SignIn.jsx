@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { login } from '../../actions/gymOwnersAction'
 import { useDispatch, useSelector } from 'react-redux'
-import Cookies from 'js-cookie'
 
 
 
-const SignIn = ({ SetSignInVisible,setUserId}) => {
+const SignIn = ({ SetSignInVisible,setToastMessage,setToastType,setToastVisible,setUser }) => {
   const dispatch = useDispatch()
   const data = useSelector((state) => state.auth)
 
@@ -30,14 +29,22 @@ const SignIn = ({ SetSignInVisible,setUserId}) => {
   }
 
   useEffect(() => {
-    if (data.token) {
+    if (data.loginStatus) {
       // eslint-disable-next-line
       handleSignInVisibility();
-      const id = Cookies.get('user')
-      setUserId(id);
+      setToastMessage('Login Successful');
+      setToastType('success');
+      setToastVisible(true);
+      // setUser(data.user);
+    } else if(data.error){
+      setToastMessage(data.error);
+      setToastType('error');
+      setToastVisible(true);
+      handleSignInVisibility();
+      dispatch({ type: 'CLEAR_ERRORS' })
     }
     // eslint-disable-next-line
-  }, [data.token])
+  }, [data.loginStatus])
 
   return (
     <div className="Auth_Modal">

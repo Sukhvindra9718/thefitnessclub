@@ -3,6 +3,7 @@ import {
   GET_ALL_USER_SUCCESS,
   GET_ALL_USER_FAIL,
   LOGIN_SUCCESS,
+  LOGIN_FAIL,
   REGISTER_USER_REQUEST,
   REGISTER_USER_SUCCESS,
   REGISTER_USER_FAIL,
@@ -20,7 +21,8 @@ import {
   GET_ALL_TRAINERS_FAIL,
   GET_ALL_TRAINEE_REQUEST,
   GET_ALL_TRAINEE_SUCCESS,
-  GET_ALL_TRAINEE_FAIL
+  GET_ALL_TRAINEE_FAIL,
+  LOGIN_REQUEST
 } from '../constant/gymOwnersConstants'
 
 import axios from 'axios'
@@ -46,9 +48,8 @@ export const getAllMembers = () => async (dispatch) => {
 }
 
 // Gym Owner Actions
-export const login =
-  ({ email, password }) =>
-  async (dispatch) => {
+export const login = ({ email, password }) => async (dispatch) => {
+    dispatch({type:LOGIN_REQUEST})
     try {
       const response = await fetch(`http://${IP}:3001/api/v1/login`, {
         method: 'POST',
@@ -57,23 +58,20 @@ export const login =
         },
         body: JSON.stringify({ email, password })
       })
-
+      const data = await response.json()
       if (response.ok) {
-        const data = await response.json()
-
         const demo = data.user
-        delete demo.profile_image
         delete demo.password
 
         Cookies.set('user', demo.id+'', { expires: 7 })
-
+        localStorage.setItem('user', JSON.stringify(demo))
         Cookies.set('token', data.token, { expires: 7 })
         dispatch({ type: LOGIN_SUCCESS, payload: data ? data : {} })
-      } else {
-        console.error('Login failed')
+      }else{
+        dispatch({type : LOGIN_FAIL,payload : data.message})
       }
     } catch (error) {
-      console.error('Error:', error)
+      dispatch({type : LOGIN_FAIL,payload : error.message})
     }
   }
 
@@ -121,12 +119,9 @@ export const getLoginUser = (id) => async (dispatch) => {
 
     const { data } = await axios.get(`http://${IP}:3001/api/v1/getUserDetail/${id}`, config)
 
-    delete data.user.password
-    localStorage.setItem('user', JSON.stringify(data.user));
-
     dispatch({ type: GET_LOGIN_USER_SUCCESS, payload: data.user })
   } catch (error) {
-    dispatch({ type: GET_LOGIN_USER_FAIL, payload: error.response })
+    dispatch({ type: GET_LOGIN_USER_FAIL, payload: error.message })
   }
 }
 

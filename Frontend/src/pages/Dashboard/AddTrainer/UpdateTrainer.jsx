@@ -2,11 +2,11 @@ import Cookies from 'js-cookie'
 import React, { useState } from 'react'
 import { TbCameraUp } from 'react-icons/tb'
 import axios from 'axios'
-
-
+import Loader from '../../../components/Loader'
 const UpdateTrainer = ({ setUpdateVisible, user }) => {
   const [editMode, setEditMode] = useState(true)
   const [selectedFile, setSelectedFile] = useState('./DefaultUser.svg')
+  const [loading, setLoading] = useState(false)
 
   const [formData, setFormData] = useState({
     firstname: user.firstname,
@@ -45,7 +45,8 @@ const UpdateTrainer = ({ setUpdateVisible, user }) => {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setLoading(true)
     if (
       formData.firstname === '' ||
       formData.lastname === '' ||
@@ -103,17 +104,26 @@ const UpdateTrainer = ({ setUpdateVisible, user }) => {
       .then((res) => {
         if (res.data.success) {
           alert('Trainer Updated Successfully')
+          setLoading(false)
           window.location.reload()
         } else {
           alert(res.data.message)
+          setLoading(false)
         }
       })
-      .catch((err) => {
-        alert(err.message)
+      .catch((error) => {
+        if (error.isAxiosError && error.response && error.response.data) {
+          const errorMessage = error.response.data.message;
+          alert(`Error: ${errorMessage}`);
+          setLoading(false)
+        } else {
+          alert('An unexpected error occurred. Please try again.');
+          setLoading(false)
+        }
       })
   }
 
-  return (
+  return loading?(<Loader loading={loading}/>):(
     <div className="Auth_Modal">
       <div className="Auth_Container MyAccount_Container">
         <div className="Auth_Logo">

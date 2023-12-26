@@ -457,7 +457,7 @@ exports.getAllTrainers = CatchAsyncErrors(async (req, res, next) => {
 
 exports.deleteTrainer = CatchAsyncErrors(async (req, res, next) => {
   const userId = req.params.id;
-  console.log(userId)
+
   try {
     const client = await pool.connect();
     const query = `DELETE FROM trainer WHERE id = $1`;

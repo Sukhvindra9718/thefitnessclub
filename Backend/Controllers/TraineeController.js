@@ -6,7 +6,7 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-// const { createTable } = require("../Utils/checkIfTableExists.js");
+const { createTable } = require("../Utils/checkIfTableExists.js");
 
 const pool = new Pool({
   user: process.env.PGUSER,
@@ -16,21 +16,48 @@ const pool = new Pool({
   port: 5432, // Default PostgreSQL port
 });
 
-exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
-  const { firstname,lastname, email, dob, phoneNumber,address,pincode,state,city,country} = req.body;
-  console.log("req.body",req.body)
-  const profileImage = "fhghg"; // multer file buffer
+exports.registerTrainee = CatchAsyncErrors(async (req, res, next) => {
+  const {
+    firstname,
+    lastname,
+    AadharCard,
+    DOB,
+    Address,
+    email,
+    phoneNumber,
+    pincode,
+    state,
+    city,
+    country,
+    status,
+    extentMembership,
+    discount,
+    receiptNumber,
+    gender,
+    joiningDate,
+    group,
+    planStartDate,
+    planEndDate,
+    plan,
+    duration,
+    planPrice,
+    totalAmount,
+    amountPaid,
+    balanceAmount,
+    modeOfPayment,
+  } = req.body;
+  const profileImage =
+    req?.file?.buffer === undefined ? undefined : req.file.buffer; // multer file buffer
 
   const otp = Math.floor(100000 + Math.random() * 900000);
   const hashedPassword = await bcrypt.hash(otp.toString(), 10);
-  const gymOwnerId = 14;
+  const gymOwnerId = req.user.id;
   const isVerified = false;
   const role = "trainee";
   const resetPasswordToken = undefined;
   const resetPasswordTokenExpire = undefined;
-  const status = "active";
   const query =
-    "INSERT INTO trainee (firstname,lastname, email, password,phonenumber,dob,address,pincode,state,city,otp,isverified,role,profile_image,resetpasswordtoken,resetpasswordtokenexpire,gymownerid,country,status) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)";
+    "INSERT INTO trainee (firstname,lastname,aadharcard,dob,address, email,password,phonenumber,pincode,city,state,country,status,extentmembership,discount,receiptnumber,gender,joiningdate,groups,planstartdate,planenddate,plan,duration,planprice,totalamount,amountpaid,balanceamount,modeofpayment,profile_image,otp,isverified,role,resetpasswordtoken,resetpasswordtokenexpire,gymownerid) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35)";
 
   // create html mail template with otp verification code
   const message = `<!DOCTYPE html>
@@ -88,23 +115,39 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
     await pool.query(query, [
       firstname,
       lastname,
+      AadharCard,
+      DOB,
+      Address,
       email,
       hashedPassword,
       phoneNumber,
-      dob,
-      address,
       pincode,
-      state,
       city,
+      state,
+      country,
+      status,
+      extentMembership,
+      discount,
+      receiptNumber,
+      gender,
+      joiningDate,
+      group,
+      planStartDate,
+      planEndDate,
+      plan,
+      duration,
+      planPrice,
+      totalAmount,
+      amountPaid,
+      balanceAmount,
+      modeOfPayment,
+      profileImage,
       otp,
       isVerified,
       role,
-      profileImage,
       resetPasswordToken,
       resetPasswordTokenExpire,
       gymOwnerId,
-      country,
-      status
     ]);
 
     const result = await SendEmail({
@@ -122,11 +165,9 @@ exports.registerUser = CatchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }
-
-  // Close the pool when done
 });
 
-exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
+exports.loginTrainee = CatchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
   let user = null;
   //Checks if email and password is entered by user
@@ -134,7 +175,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email & password", 400));
   }
   user = await getUserFromDatabase("email", email);
-  
+
   //Checks if password is correct or not
   if (user.isVerified === false) {
     return next(new ErrorHandler("Please verify your email", 401));
@@ -147,7 +188,7 @@ exports.loginUser = CatchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
+exports.verifyTrainee = CatchAsyncErrors(async (req, res, next) => {
   const { email, otp } = req.body;
 
   //Checks if otp is valid entered by user
@@ -172,16 +213,17 @@ exports.verifyUser = CatchAsyncErrors(async (req, res, next) => {
       await client.query(query, ["", true, email]);
     } catch (error) {
       return next(new ErrorHandler(error.message, 400));
-    } finally {
-      pool.end(); // Close the pool when done
     }
-    sendToken(user, 200, res);
+    res.status(200).json({
+      success: true,
+      message: "OTP verified successfully",
+    });
   } else {
     return next(new ErrorHandler("Invalid otp", 401));
   }
 });
 
-exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
+exports.logoutTrainee = CatchAsyncErrors(async (req, res, next) => {
   res.cookie("token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
@@ -192,7 +234,7 @@ exports.logoutUser = CatchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.getUserDetail = CatchAsyncErrors(async (req, res, next) => {
+exports.getTraineeDetail = CatchAsyncErrors(async (req, res, next) => {
   let user = req.user;
   res.status(200).json({
     success: true,
@@ -373,29 +415,45 @@ exports.updatePassword = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
-  const { name, email, phoneNumber, address, role } = req.body;
+  const {
+    firstname,
+    lastname,
+    email,
+    phonenumber,
+    address,
+    dob,
+    pincode,
+    aadharcard,
+    country,
+    joiningdate,
+    state,
+    status,
+    city,
+    gender,
+    userId,
+  } = req.body;
   const profileImage =
     req?.file?.buffer == undefined ? undefined : req.file.buffer; // multer file buffer
 
-  const user = await getUserFromDatabase("id", req.user.id);
-  let newRole = role != undefined ? role : user.role;
 
   const newUserData = {
-    name: name,
+    firstname: firstname,
+    lastname: lastname,
     email: email,
-    password: user.password,
-    phonenumber: phoneNumber,
+    phonenumber: phonenumber,
     address: address,
-    otp: user.otp,
-    isverified: user.isverified,
-    role: newRole,
-    profile_image:
-      profileImage === undefined ? user.profile_image : profileImage,
-    createdat: user.createdat,
-    resetpasswordtoken: user.resetpasswordtoken,
-    resetpasswordtokenexpire: user.resetpasswordtokenexpire,
+    dob: dob,
+    pincode: pincode,
+    aadharcard: aadharcard,
+    country: country,
+    joiningdate: joiningdate,
+    state: state,
+    status: status,
+    city: city,
+    gender: gender,
+    profile_image: profileImage,
+    id: userId,
   };
-
   updateUserInDatabase(newUserData);
   res.status(200).json({
     success: true,
@@ -404,28 +462,32 @@ exports.updateProfile = CatchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllTrainees = CatchAsyncErrors(async (req, res, next) => {
-  console.log("Get all trainees")
-  let trainees = [];
+  console.log("Get all trainees");
+  let trainees1 = [];
   try {
     const client = await pool.connect();
     const query = `SELECT * FROM trainee where gymownerid = ${req.user.id}`;
     const result = await client.query(query, []);
 
     if (result.rows.length !== 0) {
-      trainees = result.rows;
+      trainees1 = result.rows;
     }
   } catch (error) {
     return next(new ErrorHandler(error.message, 400));
   }
-
+  const trainees = trainees1.map((trainee) => {
+    return {
+      ...trainee,
+      profile_image: trainee.profile_image.toString("base64"),
+    };
+  });
   res.status(200).json({
     success: true,
     trainees,
   });
-
 });
 
-exports.deleteUser = CatchAsyncErrors(async (req, res, next) => {
+exports.deleteTrainee = CatchAsyncErrors(async (req, res, next) => {
   const userId = req.params.id;
   try {
     const client = await pool.connect();
@@ -483,23 +545,48 @@ const getUserFromDatabase = async (findById, value) => {
 const updateUserInDatabase = async (user) => {
   try {
     const client = await pool.connect();
-    const query =
-      "UPDATE trainee SET name = $1, email = $2, password = $3, phonenumber = $4, address = $5, otp = $6, isverified = $7, role = $8, profile_image = $9,createdat = $10, resetpasswordtoken = $11, resetpasswordtokenexpire = $12 WHERE email = $2";
-
-    await client.query(query, [
-      user.name,
-      user.email,
-      user.password,
-      user.phonenumber,
-      user.address,
-      user.otp,
-      user.isverified,
-      user.role,
-      user.profile_image,
-      user.createdat,
-      user.resetpasswordtoken,
-      user.resetpasswordtokenexpire,
-    ]);
+    if (user.profile_image === undefined) {
+      const query =
+        "UPDATE trainee SET firstname = $1,lastname = $2, email = $3,phonenumber = $4,address = $5,dob = $6,pincode = $7, aadharcard = $8,country = $9, joiningdate = $10,state = $11, status = $12, city = $13,gender = $14 WHERE id = $15";
+      await client.query(query, [
+        user.firstname,
+        user.lastname,
+        user.email,
+        user.phonenumber,
+        user.address,
+        user.dob,
+        user.pincode,
+        user.aadharcard,
+        user.country,
+        user.joiningdate,
+        user.state,
+        user.status,
+        user.city,
+        user.gender,
+        user.id,
+      ]);
+    } else {
+      const query =
+        "UPDATE trainee SET firstname = $1,lastname = $2, email = $3,phonenumber = $4,address = $5,dob = $6,pincode = $7, aadharcard = $8,country = $9, joiningdate = $10,state = $11, status = $12, city = $13,gender = $14,profile_image = $15 WHERE id = $16";
+      await client.query(query, [
+        user.firstname,
+        user.lastname,
+        user.email,
+        user.phonenumber,
+        user.address,
+        user.dob,
+        user.pincode,
+        user.aadharcard,
+        user.country,
+        user.joiningdate,
+        user.state,
+        user.status,
+        user.city,
+        user.gender,
+        user.profile_image,
+        user.id,
+      ]);
+    }
   } catch (error) {
     return error;
   }
@@ -548,42 +635,42 @@ function addMinutes(date, minutes) {
 // Replace these variables with your table and column definitions
 
 // const columns = [
-//   { name: "id", type: "SERIAL PRIMARY KEY" },
-//   { name:"gymOwner_id",type:"INTEGER NOT NULL"},
-//   { name: "firstname", type: "VARCHAR(100) NOT NULL" },
-//   { name: "lastname", type: "VARCHAR(100) NOT NULL" },
-//   { name: "email", type: "VARCHAR(60) UNIQUE NOT NULL" },
-//   { name: "password", type: "VARCHAR(500) NOT NULL" },
-//   { name: "phoneNumber", type: "VARCHAR(10) NOT NULL" },
-//   { name: "dob",type:"DATE NOT NULL"},
-//   { name: "address", type: "VARCHAR(255) NOT NULL" },
-//   { name: "pincode", type: "VARCHAR(6) NOT NULL" },
-//   { name: "city", type: "VARCHAR(255) NOT NULL" },
-//   { name: "state", type: "VARCHAR(255) NOT NULL" },
-//   { name:"country",type:"VARCHAR(255) NOT NULL"},
+//   { name: "id",type:"SERIAL PRIMARY KEY"},
+//   { name: "gymOwnerId",type: "INTEGER NOT NULL"},
+//   { name: "firstname",type: "VARCHAR(100) NOT NULL"},
+//   { name: "lastname",type: "VARCHAR(100) NOT NULL"},
+//   { name: "aadharcard",type: "VARCHAR(12) NOT NULL"},
+//   { name: "dob",type: "DATE NOT NULL"},
+//   { name: "address",type: "VARCHAR(255) NOT NULL"},
+//   { name: "email",type: "VARCHAR(50) NOT NULL"},
+//   { name: "password",type: "VARCHAR(255) NOT NULL"},
+//   { name: "phonenumber",type: "VARCHAR(10) NOT NULL"},
+//   { name: "pincode",type: "VARCHAR(6) NOT NULL"},
+//   { name: "city",type: "VARCHAR(50) NOT NULL"},
+//   { name: "state",type: "VARCHAR(50) NOT NULL"},
+//   { name: "country",type: "VARCHAR(50) NOT NULL"},
+//   { name: "status",type: "VARCHAR(15) NOT NULL"},
+//   { name: "extentMembership",type: "Integer NOT NULL"},
+//   { name: "discount",type: "DECIMAL(10,2) NOT NULL"},
+//   { name: "receiptNumber",type: "VARCHAR(30) NOT NULL"},
+//   { name: "gender",type: "VARCHAR(10) NOT NULL"},
+//   { name: "joiningdate",type:"DATE NOT NULL"},
+//   { name: "groups",type: "VARCHAR(10) NOT NULL"},
+//   { name: "startdate",type:"DATE NOT NULL"},
+//   { name: "enddate",type:"DATE NOT NULL"},
+//   { name: "plan",type: "VARCHAR(20) NOT NULL"},
+//   { name: "duration",type: "Integer NOT NULL"},
+//   { name: "planPrice",type: "DECIMAL(10,2) NOT NULL"},
+//   { name: "totalAmount",type:"DECIMAL(10,2) NOT NULL"},
+//   { name: "amountPaid",type:"DECIMAL(10, 2) NOT NULL"},
+//   { name: "balanceAmount",type:"DECIMAL(10, 2) NOT NULL"},
+//   { name: "modeOfPayment",type:"VARCHAR(20) NOT NULL"},
+//   { name: "ProfileImage",type:"BYTEA NOT NULL"},
 //   { name: "otp", type: "VARCHAR(8)" },
 //   { name: "isVerified", type: "BOOLEAN" },
 //   { name: "role", type: "VARCHAR(15)" },
-//   { name: "profile_image", type: "BYTEA NOT NULL" },
-//   { name: "createdAt", type: "timestamptz DEFAULT NOW()" },
 //   { name: "resetPasswordToken", type: "VARCHAR(500)" },
 //   { name: "resetPasswordTokenExpire", type: "timestamptz" },
-// ];
-// createTable("traineePlansInfo", columns);
-
-
-// const columns = [
-//   { name: "id",type:"SERIAL PRIMARY KEY"},
-//   { name: "traineeId",type: "INTEGER NOT NULL"},
-//   { name: "plan",type: "VARCHAR(255) NOT NULL"},
-//   { name: "duration",type: "VARCHAR(255) NOT NULL"},
-//   { name: "groups",type: "VARCHAR(255) NOT NULL"},
-//   { name: "startdate",type:"DATE NOT NULL"},
-//   { name: "enddate",type:"DATE NOT NULL"},
-//   { name: "extentmembership",type:"INTEGER NOT NULL"},
-//   { name: "totalamount",type:"DECIMAL(10,2) NOT NULL"},
-//   { name: "modeofpayment",type:"VARCHAR(20) NOT NULL"},
-//   { name: "amountpaid",type:"DECIMAL(10, 2) NOT NULL"},
 // ]
 
-// createTable("traineePlansInfo", columns);
+// createTable("trainee", columns);
